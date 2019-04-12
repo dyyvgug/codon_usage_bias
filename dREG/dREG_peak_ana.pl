@@ -20,7 +20,7 @@ while (<hand2>)   {
     $genome{$ge} .= $_; }
 close hand2;
 #=========================================================================================================
-# This part of bedgraph is for PRO-seq.
+# This part of bedgraph is for dREG.
 #=========================================================================================================
 
 my %plus;
@@ -100,7 +100,7 @@ while (<dREG>)   {
 
 		next if $distance > 500; # with this creteria we should known that the region is not as enhancer.
 #====================================================================================
-# this part is PRO-seq. 
+# this part is dREG. 
 #====================================================================================
 
 		my $signal = 0;

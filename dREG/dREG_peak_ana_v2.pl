@@ -5,8 +5,8 @@ use strict;
 =cut
 
 mkdir "dREG_peak_analysis";
-my $ge ; my %genome; my $species = "hg19" ;
 =head1
+my $ge ; my %genome; my $species = "hg19" ;
 open (hand2, "/media/hp/disk1/DYY/reference/genome/$species/genome.fa") or die $!;
 while (<hand2>)   {
 	$_=~ s/\s+$//;       # Remove"Enter" of per line.
@@ -21,6 +21,7 @@ while (<hand2>)   {
     $genome{$ge} .= $_; }
 close hand2;
 =cut
+
 #=========================================================================================================
 # This part of bedgraph is for PRO-seq.
 #=========================================================================================================
@@ -78,9 +79,9 @@ close hand6;
 
 open (dREG, "0325peak_closer_sort.txt") or die $!;
 open (F, ">dREG_peak_analysis/peak_analysis.txt");
-print F "chr\tgene\tdRGE_score\tRRO_signal\tPRO_signal_density\tGro_signal\tGro_density\n";
- "transcript_id\tdREG_score\tpromoter_signal\tpromoter_signal_density\tGRO_seq_gene_body_density\n";
-
+print F "chr\tdREG_start\tdREG_end\tgene\tdRGE_score\tdREG_signal\tdREG_signal_density\tGro_signal\tGro_density\n";
+open (INTERNAL,">dREG_peak_analysis/internal_enhancer" ); # record internal enhancer
+print INTERNAL "distance\tdREG_start\tdREG_end\ten_signal\ten_density\n";
 # output file should contain gene|transcript name, dREG score, dREG region average signal, which use the reference file(bedgraph) to calcualate the density of signal 
 while (<dREG>)   {
 	   chomp;     
@@ -96,14 +97,27 @@ while (<dREG>)   {
 		my $transcript_end = $a[6];
 		
 		my $distance;
-		if ($a[9] eq "+") {
-			$distance = abs($reg_start - $transcript_end);}
+		if ($a[9] eq "-") {
+			$distance = $reg_start - $transcript_end;
+			}
 		else {
-			$distance = abs($reg_end - $transcript_start);}
+			$distance = $reg_end - $transcript_start;
+			next if $distance < -500;
+}			if ($distance > 500 & $transcript_end - $reg_end > 0 ) { 	# this part will assign as internal enhancer 
+				my $en_signal = 0;
+				for my $i ($reg_start..$reg_end-1)   {
+					$en_signal += $plus{$chr."_".$i} if exists $plus{$chr."_".$i};
+					$en_signal += abs($minus{$chr."_".$i}) if exists $minus{$chr."_".$i};  
+						}
 
-		next if $distance > 500; # with this creteria we should known that the region is not as enhancer.
+				my $en_density = $en_signal/($reg_end - $reg_start);
+				print INTERNAL "$distance\t$reg_start\t$reg_end\t$en_signal\t$en_density\n";
+				
+}
+
+		#next if $distance > 500; # with this creteria we should known that the region is not as enhancer.
 #====================================================================================
-# this part is PRO-seq. 
+# this part is dREG_peak. 
 #====================================================================================
 
 		my $signal = 0;
@@ -130,11 +144,12 @@ while (<dREG>)   {
 			}
 
 		my $elo_density = $gro_elo/($transcript_end - $transcript_start);
+
 			
-        print F "$chr\t$gene_id\t$reg_score\t$signal\t$density\t$gro_elo\t$elo_density\n"; 
+        print F "$chr\t$reg_start\t$reg_end\t$gene_id\t$reg_score\t$signal\t$density\t$gro_elo\t$elo_density\n"; 
 				
 				}
 }
-close dREG; close F;
+close dREG; close INTERNAL; close F;
 
 

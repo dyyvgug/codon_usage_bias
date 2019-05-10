@@ -1,61 +1,127 @@
-library(DOSE)
-library(org.Sc.sgd.db)
+# GO and KEGG analysis.Dong Yingying.2019-5-9.
+#library(DOSE)
+library(org.EcK12.eg.db)
 library(topGO)
 library(clusterProfiler)
 library(pathview)
 
-keytypes(org.Sc.sgd.db)
-species = "Saccharomyces_cerevisiae"
-setwd(paste0("/media/hp/disk1/DYY/reference/annotation/",species,"/correlation_bycodonW2/" ))
-
-data <- read.table("gene_id.txt",header=FALSE)      #单列基因名文件
-data$V1 <- as.character(data$V1)                    #需要character格式，然后进行ID转化
-                                                    #将SYMBOL格式转为ENSEMBL和ENTERZID格式 
-#test1 = bitr(data$V1, fromType="SYMBOL", toType=c("ENSEMBL", "ENTREZID"), OrgDb="org.Sc.sgd.db")
-test1 = bitr(data$V1, fromType="GENENAME", toType= "ENTREZID", OrgDb="org.Sc.sgd.db")
-head(test1,2)
-write.table(test1,file = "genename_id.txt",sep = '\t',quote = FALSE,
+keytypes(org.EcK12.eg.db)
+species = "Escherichia_coli"
+setwd(paste0("/media/hp/disk1/DYY/reference/annotation/",species,"/correlation_bycodonW3/" ))
+#==============================================================================================
+# Read data and conversion id
+#==============================================================================================
+symbol_id = read.table("gene_id.txt",header=FALSE)      
+symbol_id = as.character(symbol_id$V1)                    
+entrez_id = bitr(symbol_id, fromType="SYMBOL", toType= "ENTREZID", OrgDb="org.EcK12.eg.db")
+head(entrez_id,2)
+write.table(entrez_id,file = "symbol_entrez_id.txt",sep = '\t',quote = FALSE,
             row.names = FALSE)
-
-data(geneList, package="DOSE")                      #富集分析的背景基因集
-gene <- names(geneList)[abs(geneList) > 2]
-gene.df <- bitr(gene, fromType = "ENTREZID", toType = c("ENSEMBL", "GENENAME"), OrgDb = org.Sc.sgd.db)
-head(gene.df,2)
-ggo <- groupGO(gene = test1$ENTREZID, OrgDb = org.Sc.sgd.db, ont = "CC",level = 3,readable = TRUE)
-ego_ALL <- enrichGO(gene = test1$ENTREZID, 
-                    universe = names(geneList),     #背景基因集
-                    OrgDb = org.Sc.sgd.db,           #没有organism="human"，改为OrgDb=org.Hs.eg.db
-                    #keytype = 'ENTREZID',
-                    ont = "ALL",                    #也可以是 CC  BP  MF中的一种
-                    #ont： 是BP（Biological Process）, CC（Cellular Component）, MF（Molecular Function）
-                    pAdjustMethod = "BH",           #矫正方式 holm”, “hochberg”, “hommel”, “bonferroni”,
-                    #“BH”, “BY”, “fdr”, “none”中的一种
-                    minGSSize = 10,
-                    maxGSSize = 500,
-                    pvalueCutoff = 0.05,               #P值会过滤掉很多，可以全部输出
-                    qvalueCutoff = 0.2,
-                    readable = TRUE)                #Gene ID 转成gene Symbol ，易读
-head(ego_ALL,2)
-write.csv(summary(ego_ALL),"ALL-enrich.csv",row.names =FALSE)
-# setReadable
-ego_MF <- enrichGO(gene = test1$ENTREZID,ont = "MF",
-                   pvalueCutoff = 0.05, pAdjustMethod = "BH", universe, qvalueCutoff = 0.2,
-                   minGSSize = 10, maxGSSize = 500, readable = FALSE, pool = FALSE)
-ego_MF1 <- setReadable(ego_MF,OrgDb = org.Sc.sgd.db)
-
-dotplot(ego_MF,title="EnrichmentGO_MF_dot")
-barplot(ego_MF, showCategory=20,title="EnrichmentGO_MF")
-plotGOgraph(ego_MF)
+only_entrezID = entrez_id[-1]
+write.table(only_entrezID,file = "ENTREZID.txt",sep = '\t',quote = FALSE,
+            row.names = FALSE)
+#==============================================================================================
+# GO analysis ORA(over-representation analysis)
+#==============================================================================================
+#**************all(Biological Process,Cellular Component,Molecular Function)*******************
+ogo_all = enrichGO(
+    gene = entrez_id$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = "org.EcK12.eg.db",        
+    ont = "ALL",                    # Can also be a kind of CC,BP,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE)                # ID to Symbol,easy to read
+head(ogo_all,2)
+write.table(ogo_all,"GO_aLL_enrich.txt",row.names =FALSE)
+dotplot(ogo_all,title="EnrichmentGO_all_dot")
+barplot(ogo_all,showCategory=10,title="EnrichmentGO_all_bar")
+#*********************************** MF(Molecular Function)*************************************
+ogo_MF = enrichGO(
+    gene = entrez_id$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = "org.EcK12.eg.db",        
+    ont = "MF",                    # Can also be a kind of CC,BP,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE) 
+head(ogo_MF)
+write.table(ogo_MF,"GO_MF_enrich.txt",row.names =FALSE)
+dotplot(ogo_MF,title="EnrichmentGO_MF_dot")
+barplot(ogo_MF,showCategory=10,title="EnrichmentGO_MF_bar")
+plotGOgraph(ogo_MF)
+#.rs.restartR()                    # if occur error 
+goplot(ogo_MF)
+emapplot(ogo_MF,showCategory = 30)
+cnetplot(ogo_MF,showCategory = 5)
+#********************************BP(Biological Process)*******************************
+ogo_BP = enrichGO(
+    gene = entrez_id$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = "org.EcK12.eg.db",        
+    ont = "BP",                    # Can also be a kind of CC,BP,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE) 
+head(ogo_BP)
+write.table(ogo_BP,"GO_BP_enrich.txt",row.names =FALSE)
+dotplot(ogo_BP,title="EnrichmentGO_BP_dot")
+barplot(ogo_BP,showCategory=10,title="EnrichmentGO_BP_bar")
+plotGOgraph(ogo_BP)
+#.rs.restartR()                    # if occur error 
+goplot(ogo_BP)
+emapplot(ogo_BP,showCategory = 30)
+cnetplot(ogo_BP,showCategory = 5)
+#********************************CC(Cellular Component)*******************************
+ogo_CC = enrichGO(
+    gene = entrez_id$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = "org.EcK12.eg.db",        
+    ont = "CC",                     # Can also be a kind of CC,BP,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE) 
+head(ogo_CC)
+write.table(ogo_CC,"GO_CC_enrich.txt",row.names =FALSE)
+dotplot(ogo_CC,title="EnrichmentGO_CC_dot")
+barplot(ogo_CC,showCategory=10,title="EnrichmentGO_CC_bar")
+plotGOgraph(ogo_CC)
+#.rs.restartR()                    # if occur error 
+goplot(ogo_CC)
+emapplot(ogo_CC,showCategory = 30)
+cnetplot(ogo_CC,showCategory = 5)
+#==============================================================================================
+# GO analysis GSEA(gene set enrichment analysis)    supplement later
+#==============================================================================================
+#ggo_CC = gseGO(
+#    geneList = ,           # id & fold change etc.
+#    OrgDb = "org.EcK12.eg.db",        
+#    ont = "CC",
+#    nPerm = 1000,
+#    minGSSize = 100,
+#    maxGSSize = 500,
+#    pvalueCutoff = 0.05,
+#    verbose = FALSE
+# )
 #=====================================================================================
-#KEGG
+# KEGG analysis
 #=====================================================================================
-gene_df <- read.table("genename_id.txt",sep = '\t',header = T,quote = "")
-kk <- enrichKEGG(gene = gene_df$GENENAME,
-                 organism = 'sce',                 #KEGG可以用organism = 'hsa'
-                 pvalueCutoff = 1)
-gene_df2 = bitr_kegg(gene_df$ENTREZID,fromType = "ENTREZID",toType = 'PATH',organism='sce')
-ego <- enrichKEGG(gene = gene_df$ENTREZID, keyType = "ENTREZID", 
-                  organism = 'sce', pvalueCutoff = 0.05, 
-                  pAdjustMethod = "BH", qvalueCutoff = 0.05 )
+gk = enrichKEGG(
+    gene = entrez_id$ENTREZID,
+    keyType = "kegg", 
+    organism = 'ecj',         #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+    pAdjustMethod = "BH", 
+    pvalueCutoff = 0.05, 
+    qvalueCutoff = 0.05 )
+bitr_kegg(
+  entrez_id$ENTREZID,
+  fromType = "ncbi-geneid",
+  toType = 'kegg',
+  organism='ecj')    
+
 
 

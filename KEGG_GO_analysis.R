@@ -1,4 +1,4 @@
-# GO and KEGG analysis.Dong Yingying.2019-5-9.
+# GO and KEGG analysis.Dong Yingying.2019-5-9.Modification:2019-5-13.
 #library(DOSE)
 library(org.EcK12.eg.db)
 library(topGO)
@@ -35,8 +35,12 @@ ogo_all = enrichGO(
     readable = TRUE)                # ID to Symbol,easy to read
 head(ogo_all,2)
 write.table(ogo_all,"GO_aLL_enrich.txt",row.names =FALSE)
-dotplot(ogo_all,title="EnrichmentGO_all_dot")
-barplot(ogo_all,showCategory=10,title="EnrichmentGO_all_bar")
+svg(filename = "EnrichmentGO_ALL_dot.svg")
+dotplot(ogo_all,title = "EnrichmentGO_all_dot")
+dev.off()
+svg(filename = "EnrichmentGO_ALL_bar.svg")
+barplot(ogo_all,showCategory = 10,title = "EnrichmentGO_all_bar")
+dev.off()
 #*********************************** MF(Molecular Function)*************************************
 ogo_MF = enrichGO(
     gene = entrez_id$ENTREZID, 
@@ -49,8 +53,10 @@ ogo_MF = enrichGO(
     readable = TRUE) 
 head(ogo_MF)
 write.table(ogo_MF,"GO_MF_enrich.txt",row.names =FALSE)
-dotplot(ogo_MF,title="EnrichmentGO_MF_dot")
-barplot(ogo_MF,showCategory=10,title="EnrichmentGO_MF_bar")
+svg(filename = "EnrichmentGO_MF_dot.svg")
+dotplot(ogo_MF,title = "EnrichmentGO_MF_dot")
+dev.off()
+barplot(ogo_MF,showCategory = 10,title = "EnrichmentGO_MF_bar")
 plotGOgraph(ogo_MF)
 #.rs.restartR()                    # if occur error 
 goplot(ogo_MF)
@@ -68,8 +74,10 @@ ogo_BP = enrichGO(
     readable = TRUE) 
 head(ogo_BP)
 write.table(ogo_BP,"GO_BP_enrich.txt",row.names =FALSE)
-dotplot(ogo_BP,title="EnrichmentGO_BP_dot")
-barplot(ogo_BP,showCategory=10,title="EnrichmentGO_BP_bar")
+svg(filename = "EnrichmentGO_BP_dot.svg")
+dotplot(ogo_BP,title = "EnrichmentGO_BP_dot")
+dev.off()
+barplot(ogo_BP,showCategory = 10,title = "EnrichmentGO_BP_bar")
 plotGOgraph(ogo_BP)
 #.rs.restartR()                    # if occur error 
 goplot(ogo_BP)
@@ -81,14 +89,16 @@ ogo_CC = enrichGO(
     keyType = "ENTREZID",
     OrgDb = "org.EcK12.eg.db",        
     ont = "CC",                     # Can also be a kind of CC,BP,MF
-    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
-    pvalueCutoff = 0.05,            
-    qvalueCutoff = 0.2,
+    pAdjustMethod = "BH",           # other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.1,            
+    qvalueCutoff = 0.5,
     readable = TRUE) 
 head(ogo_CC)
 write.table(ogo_CC,"GO_CC_enrich.txt",row.names =FALSE)
-dotplot(ogo_CC,title="EnrichmentGO_CC_dot")
-barplot(ogo_CC,showCategory=10,title="EnrichmentGO_CC_bar")
+svg(filename = "EnrichmentGO_CC_dot.svg")
+dotplot(ogo_CC,title = "EnrichmentGO_CC_dot")
+dev.off()
+barplot(ogo_CC,showCategory = 10,title = "EnrichmentGO_CC_bar")
 plotGOgraph(ogo_CC)
 #.rs.restartR()                    # if occur error 
 goplot(ogo_CC)
@@ -110,18 +120,30 @@ cnetplot(ogo_CC,showCategory = 5)
 #=====================================================================================
 # KEGG analysis
 #=====================================================================================
-gk = enrichKEGG(
-    gene = entrez_id$ENTREZID,
+KEGG_id = bitr_kegg(
+    entrez_id$ENTREZID,
+    fromType = "ncbi-geneid",
+    toType = 'kegg',
+    organism='eco')    
+head(KEGG_id)
+write.table(KEGG_id,file = "KEGG_id.txt",sep = '\t',quote = FALSE,
+            row.names = FALSE)
+ke = enrichKEGG(
+    gene = KEGG_id$kegg,
     keyType = "kegg", 
-    organism = 'ecj',         #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+    organism = 'eco',         #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
     pAdjustMethod = "BH", 
     pvalueCutoff = 0.05, 
-    qvalueCutoff = 0.05 )
-bitr_kegg(
-  entrez_id$ENTREZID,
-  fromType = "ncbi-geneid",
-  toType = 'kegg',
-  organism='ecj')    
-
-
-
+    qvalueCutoff = 0.2 )
+head(ke)
+write.table(ke,"KEGG_enrich.txt",row.names =FALSE)
+svg(filename = "KEGG_dot.svg")
+dotplot(ke,showCategory = 10,title="KEGG_dot")
+dev.off()
+svg(filename = "KEGG_bar.svg")
+barplot(ke,showCategory = 10,title="KEGG_bar")
+dev.off()
+#.rs.restartR()                    # if occur error 
+emapplot(ke,showCategory = 30)
+cnetplot(ke,showCategory = 5)
+#browseKEGG(ke, "keggid")          # Mark enriched genes on the pathway map

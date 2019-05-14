@@ -6,16 +6,19 @@ library(pathview)
 library(AnnotationHub)
 require(AnnotationHub)
 hub = AnnotationHub()
-query(hub,"Bacillus")
-Bacillus.OrgDb = hub[["AH67837"]]
+unique(hub$species)
+hub$species[which(hub$species=="Bacillus subtilis")]
+query(hub,"Bacillus subtilis")
+Bacillus.OrgDb = hub[["AH10383"]]
 #query(hub,"Theobroma cacao")
 #Thecacao.OrgDb = hub[["AH66659"]]
 #columns(Thecacao.OrgDb)
+hub[hub$species == 'Bacillus subtilis'&hub$rdataclass == 'OrgDb']
 keytypes(Bacillus.OrgDb)
 columns(Bacillus.OrgDb)
 
 species = "Bacillus_subtilis"
-setwd(paste0("/media/hp/disk1/DYY/reference/annotation/",species,"/correlation_bycodonW2/" ))
+setwd(paste0("/media/hp/disk1/DYY/reference/annotation/",species,"/correlation_bycodonW3/" ))
 #==============================================================================================
 # Read data and conversion id
 #==============================================================================================
@@ -143,8 +146,8 @@ ke = enrichKEGG(
     keyType = "kegg", 
     organism = 'bsu',         #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
     pAdjustMethod = "BH", 
-    pvalueCutoff = 0.05, 
-    qvalueCutoff = 0.2 )
+    pvalueCutoff = 1, 
+    qvalueCutoff = 1 )
 head(ke)
 write.table(ke,"KEGG_enrich.txt",row.names =FALSE)
 svg(filename = "KEGG_dot.svg")

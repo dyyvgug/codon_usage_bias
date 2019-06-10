@@ -1,4 +1,4 @@
-#2019-4-12.Correlation analysis of CAI and global gene expression in all samples.DYY.
+#2019-6-6.Correlation analysis of Nc and various gene expression levels in all samples.DYY.
 species = "Apis_mellifera"
 setwd(paste0("/media/hp/disk1/DYY/reference/annotation/", species))
 cbi_cai  = read.table(paste("/media/hp/disk1/DYY/reference/annotation/", 

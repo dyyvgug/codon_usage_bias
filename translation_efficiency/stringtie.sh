@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+cd ./aligned/
 for item in $(ls *.sam)
 do
 	echo "sam_${item%.*}"		

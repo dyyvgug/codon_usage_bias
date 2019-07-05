@@ -1,5 +1,5 @@
 library('ggplot2')
-species = "Caenorhabditis_elegans"
+species = "C_elegans_Ensl_WBcel235"
 species_abb = "Ce"
 setwd(paste0("/media/hp/disk1/DYY/reference/annotation/",species,"/ref"))
 codonW = read.table(file = 'CBI_CAI_bycodonW.txt',sep = '\t',header = T,quote = "")
@@ -31,7 +31,8 @@ dev.off()
 mRNA_level = read.table("/media/hp/Katniss/DYY/aligned/C_elegans_Ensl_WBcel235/experiment2/SRR1056310.gtf.T",sep = '\t',header = F)
 names(mRNA_level) = c("rna_id","gene_name","FPKM","TPM")
 Nc_TPM = merge(codonW,mRNA_level,by.x = "transcription_id",by.y = "rna_id",all = T)
-Nc_TPM[Nc_TPM == 0] <- NA
+Nc_TPM = Nc_TPM[Nc_TPM$TPM > 1,]
+Nc_TPM$TPM = log2(Nc_TPM$TPM)
 Nc_TPM = Nc_TPM[complete.cases(Nc_TPM),] # Or df = na.omit(df)
 if(FALSE) # Multi-line comment
 {
@@ -46,11 +47,12 @@ if(FALSE) # Multi-line comment
     xlab('GC3s')
   Nc_TPM
 }
-sum(Nc_TPM$TPM > 500)
-Nc_TPM[] <- lapply(Nc_TPM, function(x) ifelse(x > 500, 500, x))
+sum(Nc_TPM$TPM == 0)
+Nc_TPM = Nc_TPM[Nc_TPM$TPM > 0,] 
+#Nc_TPM[] <- lapply(Nc_TPM, function(x) ifelse(x > 500, 500, x))
 svg(file = "Nc_TPM_plot.svg")
-Nc_TPM <- ggplot(Nc_TPM,aes(x = GC3s,y = Nc,color = TPM))+
-  geom_point(shape = 16,size = 0.1)+
+Nc_TPM_plot <- ggplot(Nc_TPM,aes(x = GC3s,y = Nc,color = TPM))+
+  geom_point(shape = 16,size = 1)+
   stat_function(fun = st.fun,size = 1,color = "black")+
   scale_y_continuous(breaks = c(25,30,35,40,45,50,55,60,65))+
   scale_color_gradientn(colours = rainbow(5))+
@@ -59,5 +61,6 @@ Nc_TPM <- ggplot(Nc_TPM,aes(x = GC3s,y = Nc,color = TPM))+
   xlab('GC3s')+
   theme_bw() +
   theme(axis.line = element_line(colour = "black"))
-Nc_TPM
+Nc_TPM_plot
 dev.off()
+

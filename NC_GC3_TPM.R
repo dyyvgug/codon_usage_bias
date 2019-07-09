@@ -1,6 +1,7 @@
 library('ggplot2')
-species = "C_elegans_Ensl_WBcel235"
-species_abb = "Ce"
+species = "hg38"
+species_abb = "Hg"
+TPM_file = "/experiment2/SRR8215976.gtf.T"
 setwd(paste0("/media/hp/disk1/DYY/reference/annotation/",species,"/ref"))
 codonW = read.table(file = 'CBI_CAI_bycodonW.txt',sep = '\t',header = T,quote = "")
 codonW = codonW[-16]
@@ -28,7 +29,7 @@ dev.off()
 #===================================================================================
 # Nc and mRNA levels
 #===================================================================================
-mRNA_level = read.table("/media/hp/Katniss/DYY/aligned/C_elegans_Ensl_WBcel235/experiment2/SRR1056310.gtf.T",sep = '\t',header = F)
+mRNA_level = read.table(paste0("/media/hp/Katniss/DYY/aligned/",species,TPM_file),sep = '\t',header = F,quote = "")
 names(mRNA_level) = c("rna_id","gene_name","FPKM","TPM")
 Nc_TPM = merge(codonW,mRNA_level,by.x = "transcription_id",by.y = "rna_id",all = T)
 Nc_TPM = Nc_TPM[Nc_TPM$TPM > 1,]
@@ -50,7 +51,7 @@ if(FALSE) # Multi-line comment
 sum(Nc_TPM$TPM == 0)
 Nc_TPM = Nc_TPM[Nc_TPM$TPM > 0,] 
 #Nc_TPM[] <- lapply(Nc_TPM, function(x) ifelse(x > 500, 500, x))
-svg(file = "Nc_TPM_plot.svg")
+svg(file = "Nc_TPM_ex2.svg")
 Nc_TPM_plot <- ggplot(Nc_TPM,aes(x = GC3s,y = Nc,color = TPM))+
   geom_point(shape = 16,size = 1)+
   stat_function(fun = st.fun,size = 1,color = "black")+
@@ -63,4 +64,5 @@ Nc_TPM_plot <- ggplot(Nc_TPM,aes(x = GC3s,y = Nc,color = TPM))+
   theme(axis.line = element_line(colour = "black"))
 Nc_TPM_plot
 dev.off()
+
 

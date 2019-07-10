@@ -1,17 +1,20 @@
 #2019-6-26.DYY.A cursory look at several ribosomes on each gene.
-RNA = read.table("~/Desktop/SRP136094/SRR6869737_abund.out",sep = "\t",header = T,quote = "")
+species = "C_elegans_Ensl_WBcel235" 
+RNAseq_path = "/RNAseq1/experiment2/SRR1056314_abund.out"
+RNA = read.table(paste0("/home/hp/Desktop/other_riboseq/",species,RNAseq_path),sep = "\t",header = T,quote = "")
 RNA = RNA[,-c(3,4,5,6,7)]
-setwd("~/Desktop/SRP136094/fq")
+setwd(paste0("~/Desktop/other_riboseq/",species,"/experiment2/aligned"))
+dir.create("ribo_num")
 ribo_array = list.files(getwd(),pattern = ".out$")
 ribo_array
 for (i in ribo_array){
-  #ribo = read.table("~/Desktop/SRP136094/fq/SRR6869751_25_abund.out",sep = "\t",header = T,quote = "")
-  #name = "SRR6869751_25_abund.out"
+  #ribo = read.table("SRR1804340_abund.out",sep = "\t",header = T,quote = "")
+  #name = "SRR1804340_abund.out"
   #name = sub("^([^.]*).*", "\\1",name)
-  #name = gsub("_25_abund","",name)
+  #name = gsub("_abund","",name)
   ribo = read.table(i,sep = "\t",header = T,quote = "")
   name = sub("^([^.]*).*", "\\1",i)
-  name = gsub("_25_abund","",i)
+  name = sub("_abund","",name)
   ribo = ribo[,-c(2,3,4,5,6,7)]
   names(ribo) = c("Gene.ID","ribo_FPKM","ribo_TPM")
   RNA_ribo = merge(RNA,ribo,by = "Gene.ID",all = T)
@@ -22,15 +25,15 @@ for (i in ribo_array){
   RNA_ribo_num = cbind(RNA_ribo,ribo_num)
   RNA_ribo_num = RNA_ribo_num[order(RNA_ribo_num$ribo_num,decreasing = T),]
   RNA_ribo_num$Gene.ID = gsub("_.*", "", RNA_ribo_num[,1])
-  write.table(RNA_ribo_num,file = paste0("~/Desktop/SRP136094/fq/",name,"_riboNum.txt"),
+  write.table(RNA_ribo_num,file = paste0("./ribo_num/",name,"_riboNum.txt"),
               sep = "\t",quote = F,row.names = F)
-#**************************Extract genes encoding only proteins********************************  
-  only_protein = read.table("/media/hp/disk1/DYY/reference/annotation/hg19/ref/only_protein.txt",header = T)
+
+  #**************************Extract genes encoding only proteins********************************  
+  only_protein = read.table(paste0("/media/hp/disk1/DYY/reference/annotation/",species,"/ref/CBI_CAI.txt"),header = T)
   only_protein = only_protein[,-c(3,4,5)]
   only_protein_num = merge(RNA_ribo_num,only_protein,by.x = "Gene.ID",by.y = "transcription_id",all = T)
   only_protein_num = only_protein_num[complete.cases(only_protein_num),]
   only_protein_num = only_protein_num[order(only_protein_num$ribo_num,decreasing = T),]
-  write.table(only_protein_num,file = paste0("~/Desktop/SRP136094/fq/",name,"_ProtRiboNum.txt"),
+  write.table(only_protein_num,file = paste0("./ribo_num/",name,"_ProtRiboNum.txt"),
               sep = '\t',quote = F,row.names = F)
 }
-

@@ -1,4 +1,4 @@
-#2019-6-26.DYY.A cursory look at several ribosomes on each gene.
+#2019-6-26.DYY.A cursory look at several ribosomes on each gene.Same species, different laboratory RNAseq and ribo-seq.
 species = "C_elegans_Ensl_WBcel235" 
 RNAseq_path = "/RNAseq1/experiment2/SRR1056314_abund.out"
 RNA = read.table(paste0("/home/hp/Desktop/other_riboseq/",species,RNAseq_path),sep = "\t",header = T,quote = "")

@@ -35,4 +35,12 @@
   only_protein_num = only_protein_num[order(only_protein_num$ribo_num,decreasing = T),]
   write.table(only_protein_num,file = paste0("./ribo_num/",name,"_ProtRiboNum.txt"),
               sep = '\t',quote = F,row.names = F)
+  co_RNA_ri = cor(only_protein_num$TPM,only_protein_num$ribo_TPM)
+  co_RNA_ri
+  jpeg(paste0(name,"cor_RNA_ri.jpg"))
+  plot(only_protein_num$TPM,only_protein_num$ribo_TPM,main = paste0(name,"cor_RNA_ri  ",co_RNA_ri),
+       xlab="RNA_TPM",ylab="ri_TPM",pch=19,col=rgb(0,0,100,50,maxColorValue=205))
+  dev.off()
+  write.table(co_RNA_ri,file = "cor_RNA_ri.txt",sep = '\t',append = T,quote = FALSE,
+              row.names = F, col.names = F)
   

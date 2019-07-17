@@ -27,8 +27,9 @@ for (i in ribo_array){
   RNA_ribo_num$Gene.ID = gsub("_.*", "", RNA_ribo_num[,1])
   write.table(RNA_ribo_num,file = paste0("./ribo_num/",name,"_riboNum.txt"),
               sep = "\t",quote = F,row.names = F)
-
-  #**************************Extract genes encoding only proteins********************************  
+  #=================================================================================================================
+  # Extract genes encoding only proteins 
+  #=================================================================================================================
   only_protein = read.table(paste0("/media/hp/disk1/DYY/reference/annotation/",species,"/ref/CBI_CAI.txt"),header = T)
   only_protein = only_protein[,-c(3,4,5)]
   only_protein_num = merge(RNA_ribo_num,only_protein,by.x = "Gene.ID",by.y = "transcription_id",all = T)
@@ -36,7 +37,9 @@ for (i in ribo_array){
   only_protein_num = only_protein_num[order(only_protein_num$ribo_num,decreasing = T),]
   write.table(only_protein_num,file = paste0("./ribo_num/",name,"_ProtRiboNum.txt"),
               sep = '\t',quote = F,row.names = F)
-  #×××××××××××××××××××××Observe the correlation between RNAseq and RIBOseq××××××××××××××××××××××××
+  #==================================================================================================================
+  # Observe the correlation between RNAseq and RIBOseq
+  #==================================================================================================================
   co_RNA_ri = cor(only_protein_num$TPM,only_protein_num$ribo_TPM)
   co_RNA_ri
   jpeg(paste0(name,"cor_RNA_ri.jpg"))

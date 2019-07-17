@@ -29,7 +29,7 @@ write.table(RNA_ribo_num,file = paste0("./ribo_num/",name,"_riboNum.txt"),
 #=======================================================================================================
 #  Extract genes encoding only proteins
 #=======================================================================================================  
-only_protein = read.table(paste0("/media/hp/disk1/DYY/reference/annotation/",species,"/ref/CBI_CAI.txt"),sep = ",",header = T, quote = "")
+only_protein = read.table(paste0("/media/hp/disk1/DYY/reference/annotation/",species,"/ref/CBI_CAI.txt"),sep = "\t",header = T, quote = "")
 only_protein = only_protein[,-c(3,4,5)]
 only_protein_num = merge(RNA_ribo_num,only_protein,by.x = "Gene.ID",by.y = "Gene_Symbol",all = T)
 only_protein_num = only_protein_num[complete.cases(only_protein_num),]

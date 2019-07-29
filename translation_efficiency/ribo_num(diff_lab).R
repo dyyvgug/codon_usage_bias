@@ -1,4 +1,11 @@
-#2019-6-26.DYY.A cursory look at several ribosomes on each gene.Same species, different laboratory RNAseq and ribo-seq.
+#============================================================================================== 
+# 2019-7-29.Author:Dong Yingying.Roughly  observe the translation efficiency.
+# Translation efficiency is subtracted from the TPM value quantified by a sample of 
+# RNAseq transcripts and the corresponding TPM value of the RIBO-seq transcript(different lab).
+# And take out genes that express high expression and high translation level.
+#==============================================================================================
+library(ggplot2)
+library(MASS)
 species = "C_elegans_Ensl_WBcel235" 
 RNAseq_path = "/RNAseq1/experiment2/SRR1056314_abund.out"
 RNA = read.table(paste0("/home/hp/Desktop/other_riboseq/",species,RNAseq_path),sep = "\t",header = T,quote = "")
@@ -8,10 +15,13 @@ dir.create("ribo_num")
 ribo_array = list.files(getwd(),pattern = ".out$")
 ribo_array
 for (i in ribo_array){
-  #ribo = read.table("SRR1804340_abund.out",sep = "\t",header = T,quote = "")
-  #name = "SRR1804340_abund.out"
-  #name = sub("^([^.]*).*", "\\1",name)
-  #name = gsub("_abund","",name)
+  if(FALSE) # examination
+    { 
+    ribo = read.table("SRR1804340_abund.out",sep = "\t",header = T,quote = "")
+    name = "SRR1804340_abund.out"
+    name = sub("^([^.]*).*", "\\1",name)
+    name = gsub("_abund","",name)
+  }
   ribo = read.table(i,sep = "\t",header = T,quote = "")
   name = sub("^([^.]*).*", "\\1",i)
   name = sub("_abund","",name)
@@ -27,6 +37,7 @@ for (i in ribo_array){
   RNA_ribo_num$Gene.ID = gsub("_.*", "", RNA_ribo_num[,1])
   write.table(RNA_ribo_num,file = paste0("./ribo_num/",name,"_riboNum.txt"),
               sep = "\t",quote = F,row.names = F)
+
   #=================================================================================================================
   # Extract genes encoding only proteins 
   #=================================================================================================================
@@ -43,9 +54,42 @@ for (i in ribo_array){
   co_RNA_ri = cor(only_protein_num$TPM,only_protein_num$ribo_TPM)
   co_RNA_ri
   jpeg(paste0(name,"cor_RNA_ri.jpg"))
-  plot(only_protein_num$TPM,only_protein_num$ribo_TPM,main = paste0(name,"cor_RNA_ri  ",co_RNA_ri),
+  plot(only_protein_num$TPM,only_protein_num$ribo_TPM,log = "xy",main = paste0(name,"cor_RNA_ri  ",co_RNA_ri),
        xlab="RNA_TPM",ylab="ri_TPM",pch=19,col=rgb(0,0,100,50,maxColorValue=205))
   dev.off()
+  ggplot(only_protein_num,aes(x = TPM ,y = ribo_TPM))+
+    geom_point(shape = 16,size = 0.75)+
+    labs(title = paste0(name,"cor_RNA_ri    ","r=",co_RNA_ri))+
+    #scale_x_continuous(trans='log10')+
+    #scale_y_continuous(trans='log10')+
+    scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
+                  labels = trans_format("log10", math_format(10^.x))) +
+    scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
+                  labels = trans_format("log10", math_format(10^.x))) +
+    annotation_logticks(sides="bl")+
+    stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "blue",size = 0.75)+
+    theme(
+      panel.background = element_rect(fill = "lightblue",
+                                      colour = "lightblue",
+                                      size = 0.5, linetype = "solid"),
+      panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                      colour = "white"), 
+      panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                      colour = "white")
+    )
   write.table(co_RNA_ri,file = "cor_RNA_ri.txt",sep = '\t',append = T,quote = FALSE,
               row.names = F, col.names = F)
+  #==================================================================================================================
+  # Take out genes that express high expression and high translation level
+  #==================================================================================================================
+  df <- data.frame(only_protein_num$TPM,only_protein_num$ribo_TPM)
+  gene_id = only_protein_num$Gene.Name
+  names(df) = c("TPM","ribo_TPM")
+  #tmp <- cor(df$TPM,df$ribo_TPM)
+  #tmp[upper.tri(tmp)] <- 0
+  #data.new <- df[,!apply(tmp,2,function(x) any(x < 0.6))] #something wrong
+  hE_hT <- subset(x = df,subset = )
+ 
+  
 }
+

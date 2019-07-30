@@ -125,143 +125,511 @@ for (i in ribo_array){
   #==============================================================================================
   # Import data and conversion id
   #==============================================================================================
-  symbol_id = read.table("gene_id.txt",header=FALSE)      
-  symbol_id = as.character(symbol_id$V1)                    
-  entrez_id = bitr(symbol_id, 'SYMBOL','ENTREZID', Bacillus.OrgDb)
-  head(entrez_id,2)
-  write.table(entrez_id,file = "symbol_entrez_id.txt",sep = '\t',quote = FALSE,
+  ##high translation efficiency genes conversion id 
+  hiTE_symbol_id =  hiTE$Gene.Name     
+  hiTE_symbol_id = as.character(hiTE_symbol_id)                    
+  hiTE_entrez_id = bitr(hiTE_symbol_id, 'SYMBOL','ENTREZID',OrgDb)
+  head(hiTE_entrez_id,2)
+  write.table(hiTE_entrez_id,file = paste0(name,"_hiTE_sym_entrez.txt"),sep = '\t',quote = FALSE,
               row.names = FALSE)
-  only_entrezID = entrez_id[-1]
-  write.table(only_entrezID,file = "ENTREZID.txt",sep = '\t',quote = FALSE,
+  TE_only_entrezID = hiTE_entrez_id[-1]
+  write.table(TE_only_entrezID,file = paste0(name,"_hiTE_ENTREZID.txt"),sep = '\t',quote = FALSE,
               row.names = FALSE)
+  ##extreme high RNA expression level and high translation level genes
+  ehE_hT_symID = ehE_hT$Gene_name
+  ehE_hT_symID = as.character(ehE_hT_symID)
+  ehE_hT_entID = bitr(ehE_hT_symID,'SYMBOL','ENTREZID',OrgDb)
+  head(ehE_hT_entID,2)
+  write.table(ehE_hT_entID,file = paste0(name,"_ehE_hT_sym_entrez.txt"),sep = '\t',quote = F,row.names = F)
+  ehET_only_entID = ehE_hT_entID[-1]
+  write.table(ehET_only_entID,file = paste0(name,"_ehET_ENTREZID.txt"),sep = '\t',quote = F,row.names = F)
+  ## high RNA expression level and high translation level genes
+  hE_hT_symID = hE_hT$Gene_name
+  hE_hT_symID = as.character(hE_hT_symID)
+  hE_hT_entID = bitr(hE_hT_symID,'SYMBOL','ENTREZID',OrgDb)
+  head(hE_hT_entID,2)
+  write.table(hE_hT_entID,file = paste0(name,"_hE_hT_sym_entrez.txt"),sep = '\t',quote = F,row.names = F)
+  hET_only_entID = hE_hT_entID[-1]
+  write.table(hET_only_entID,file = paste0(name,"_hET_ENTREZID.txt"),sep = '\t',quote = F,row.names = F)
+  ## low RNA expression level and low translation level genes
+  lE_lT_symID = lE_lT$Gene_name
+  lE_lT_symID = as.character(lE_lT_symID)
+  lE_lT_entID = bitr(lE_lT_symID,'SYMBOL','ENTREZID',OrgDb)
+  head(lE_lT_entID,2)
+  write.table(lE_lT_entID,file = paste0(name,"_lE_lT_sym_entrez.txt"),sep = '\t',quote = F,row.names = F)
+  hET_only_entID = lE_lT_entID[-1]
+  write.table(hET_only_entID,file = paste0(name,"_lET_ENTREZID.txt"),sep = '\t',quote = F,row.names = F)
   #==============================================================================================
   # GO analysis ORA(over-representation analysis)
   #==============================================================================================
   #**************all(Biological Process,Cellular Component,Molecular Function)*******************
-  ogo_all = enrichGO(
-    gene = entrez_id$ENTREZID, 
+  ## high TE
+  hiTE_go_all = enrichGO(
+    gene = hiTE_entrez_id$ENTREZID, 
     keyType = "ENTREZID",
-    OrgDb = Bacillus.OrgDb,        
+    OrgDb = OrgDb,        
     ont = "ALL",                    # Can also be a kind of CC,BP,MF
     pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
     pvalueCutoff = 0.05,            
     qvalueCutoff = 0.2,
     readable = TRUE)                # ID to Symbol,easy to read
-  head(ogo_all,2)
-  write.table(ogo_all,"GO_aLL_enrich.txt",row.names =FALSE)
-  svg(filename = "EnrichmentGO_ALL_dot.svg")
-  dotplot(ogo_all,title = "EnrichmentGO_all_dot")
+  head(hiTE_go_all,2)
+  write.table(hiTE_go_all,file = paste0(name,"_hiTE_aLL_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_hiTE_ALLdot.svg"))
+  dotplot(hiTE_go_all,title = "EnrichmentGO_all_dot")
   dev.off()
-  svg(filename = "EnrichmentGO_ALL_bar.svg")
-  barplot(ogo_all,showCategory = 10,title = "EnrichmentGO_all_bar")
+  svg(filename = paste0(name,"_hiTE_ALLbar.svg"))
+  barplot(hiTE_go_all,showCategory = 10,title = "EnrichmentGO_all_bar")
+  dev.off()
+  ## extreme high RNA expression level and high translation level genes
+  ehE_hT_go_all = enrichGO(
+    gene = ehE_hT_entID$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = OrgDb,        
+    ont = "ALL",                    # Can also be a kind of CC,BP,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE)                # ID to Symbol,easy to read
+  head(ehE_hT_go_all,2)
+  write.table(ehE_hT_go_all,file = paste0(name,"_ehE_hT_aLL_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_ehE_hT_ALLdot.svg"))
+  dotplot(ehE_hT_go_all,title = "EnrichmentGO_all_dot")
+  dev.off()
+  svg(filename = paste0(name,"_ehE_hT_ALLbar.svg"))
+  barplot(ehE_hT_go_all,showCategory = 10,title = "EnrichmentGO_all_bar")
+  dev.off()
+  ## high RNA expression level and high translation level genes
+  hE_hT_go_all = enrichGO(
+    gene = hE_hT_entID$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = OrgDb,        
+    ont = "ALL",                    # Can also be a kind of CC,BP,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE)                # ID to Symbol,easy to read
+  head(hE_hT_go_all,2)
+  write.table(hE_hT_go_all,file = paste0(name,"_hE_hT_aLL_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_hE_hT_ALLdot.svg"))
+  dotplot(hE_hT_go_all,title = "EnrichmentGO_all_dot")
+  dev.off()
+  svg(filename = paste0(name,"_hE_hT_ALLbar.svg"))
+  barplot(hE_hT_go_all,showCategory = 10,title = "EnrichmentGO_all_bar")
+  dev.off()
+  ## low RNA expression level and low translation level genes
+  lE_lT_go_all = enrichGO(
+    gene = lE_lT_entID$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = OrgDb,        
+    ont = "ALL",                    # Can also be a kind of CC,BP,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE)                # ID to Symbol,easy to read
+  head(lE_lT_go_all,2)
+  write.table(lE_lT_go_all,file = paste0(name,"_lE_lT_aLL_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_lE_lT_ALLdot.svg"))
+  dotplot(lE_lT_go_all,title = "EnrichmentGO_all_dot")
+  dev.off()
+  svg(filename = paste0(name,"_lE_lT_ALLbar.svg"))
+  barplot(lE_lT_go_all,showCategory = 10,title = "EnrichmentGO_all_bar")
   dev.off()
   #*********************************** MF(Molecular Function)*************************************
-  ogo_MF = enrichGO(
-    gene = entrez_id$ENTREZID, 
+  ## high TE
+   hiTE_go_MF = enrichGO(
+    gene = hiTE_entrez_id$ENTREZID, 
     keyType = "ENTREZID",
-    OrgDb = Bacillus.OrgDb,        
+    OrgDb = OrgDb,        
     ont = "MF",                    # Can also be a kind of CC,BP,MF
     pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
     pvalueCutoff = 0.05,            
     qvalueCutoff = 0.2,
     readable = TRUE) 
-  head(ogo_MF)
-  write.table(ogo_MF,"GO_MF_enrich.txt",row.names =FALSE)
-  svg(filename = "EnrichmentGO_MF_dot.svg")
-  dotplot(ogo_MF,title = "EnrichmentGO_MF_dot")
+  head(hiTE_go_MF)
+  write.table(hiTE_go_MF,file = paste0(name,"_hiTE_MF_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_hiTE_MFdot.svg"))
+  dotplot(hiTE_go_MF,title = "EnrichmentGO_MF_dot")
   dev.off()
-  barplot(ogo_MF,showCategory = 10,title = "EnrichmentGO_MF_bar")
-  plotGOgraph(ogo_MF)
+  svg(filename = paste0(name,"_hiTE_MFbar.svg"))
+  barplot(hiTE_go_MF,showCategory = 10,title = "EnrichmentGO_MF_bar")
+  dev.off()
+  #plotGOgraph(hiTE_go_MF)
   #.rs.restartR()                    # if occur error 
-  goplot(ogo_MF)
-  emapplot(ogo_MF,showCategory = 30)
-  cnetplot(ogo_MF,showCategory = 5)
-  #********************************BP(Biological Process)*******************************
-  ogo_BP = enrichGO(
-    gene = entrez_id$ENTREZID, 
+  svg(filename = paste0(name,"_hiTE_MFgoplot.svg"))
+  goplot(hiTE_go_MF)
+  dev.off()
+  #emapplot(hiTE_go_MF,showCategory = 30)
+  #cnetplot(hiTE_go_MF,showCategory = 5)
+  ## extreme high RNA expression level and high translation level genes
+  ehE_hT_go_MF = enrichGO(
+    gene = ehE_hT_entID$ENTREZID, 
     keyType = "ENTREZID",
-    OrgDb = Bacillus.OrgDb,        
+    OrgDb = OrgDb,        
+    ont = "MF",                    # Can also be a kind of CC,BP,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE) 
+  head(ehE_hT_go_MF)
+  write.table(ehE_hT_go_MF,file = paste0(name,"_ehE_hT_MF_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_ehE_hT_MFdot.svg"))
+  dotplot(ehE_hT_go_MF,title = "EnrichmentGO_MF_dot")
+  dev.off()
+  svg(filename = paste0(name,"_ehE_hT_MFbar.svg"))
+  barplot(ehE_hT_go_MF,showCategory = 10,title = "EnrichmentGO_MF_bar")
+  dev.off()
+  #plotGOgraph(ehE_hT_go_MF)
+  #.rs.restartR()                    # if occur error 
+  svg(filename = paste0(name,"_ehE_hT_MFgoplot.svg"))
+  goplot(ehE_hT_go_MF)
+  dev.off()
+  ## high RNA expression level and high translation level genes
+  hE_hT_go_MF = enrichGO(
+    gene = hE_hT_entID$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = OrgDb,        
+    ont = "MF",                    # Can also be a kind of CC,BP,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE) 
+  head(hE_hT_go_MF)
+  write.table(hE_hT_go_MF,file = paste0(name,"_hE_hT_MF_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_hE_hT_MFdot.svg"))
+  dotplot(hE_hT_go_MF,title = "EnrichmentGO_MF_dot")
+  dev.off()
+  svg(filename = paste0(name,"_hE_hT_MFbar.svg"))
+  barplot(hE_hT_go_MF,showCategory = 10,title = "EnrichmentGO_MF_bar")
+  dev.off()
+  #plotGOgraph(hE_hT_go_MF)
+  #.rs.restartR()                    # if occur error 
+  svg(filename = paste0(name,"_hE_hT_MFgoplot.svg"))
+  goplot(hE_hT_go_MF)
+  dev.off()
+  ## low RNA expression level and low translation level genes
+  lE_lT_go_MF = enrichGO(
+    gene = lE_lT_entID$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = OrgDb,        
+    ont = "MF",                    # Can also be a kind of CC,BP,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 1,            
+    qvalueCutoff = 1,
+    readable = TRUE) 
+  head(lE_lT_go_MF)
+  write.table(lE_lT_go_MF,file = paste0(name,"_lE_lT_MF_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_lE_lT_MFdot.svg"))
+  dotplot(lE_lT_go_MF,title = "EnrichmentGO_MF_dot")
+  dev.off()
+  svg(filename = paste0(name,"_lE_lT_MFbar.svg"))
+  barplot(lE_lT_go_MF,showCategory = 10,title = "EnrichmentGO_MF_bar")
+  dev.off()
+  #plotGOgraph(lE_lT_go_MF)
+  #.rs.restartR()                    # if occur error 
+  svg(filename = paste0(name,"_lE_lT_MFgoplot.svg"))
+  goplot(lE_lT_go_MF)
+  dev.off()
+  #********************************BP(Biological Process)*******************************
+  ## high TE
+  hiTE_go_BP = enrichGO(
+    gene = hiTE_entrez_id$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = OrgDb,        
     ont = "BP",                    # Can also be a kind of CC,BP,MF
     pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
     pvalueCutoff = 0.05,            
     qvalueCutoff = 0.2,
     readable = TRUE) 
-  head(ogo_BP)
-  write.table(ogo_BP,"GO_BP_enrich.txt",row.names =FALSE)
-  svg(filename = "EnrichmentGO_BP_dot.svg")
-  dotplot(ogo_BP,title = "EnrichmentGO_BP_dot")
+  head(hiTE_go_BP)
+  write.table(hiTE_go_BP,file = paste0(name,"_hiTE_BP_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_hiTE_BPdot.svg"))
+  dotplot(hiTE_go_BP,title = "EnrichGO_BP_dot")
   dev.off()
-  barplot(ogo_BP,showCategory = 10,title = "EnrichmentGO_BP_bar")
-  plotGOgraph(ogo_BP)
+  svg(filename = paste0(name,"_hiTE_BPbar.svg"))
+  barplot(hiTE_go_BP,showCategory = 10,title = "EnrichmentGO_BP_bar")
+  dev.off()
+  #plotGOgraph(hiTE_go_BP)
   #.rs.restartR()                    # if occur error 
-  goplot(ogo_BP)
-  emapplot(ogo_BP,showCategory = 30)
-  cnetplot(ogo_BP,showCategory = 5)
-  #********************************CC(Cellular Component)*******************************
-  ogo_CC = enrichGO(
-    gene = entrez_id$ENTREZID, 
+  svg(filename = paste0(name,"_hiTE_BPgoplot.svg"))
+  goplot(hiTE_go_BP)
+  dev.off()
+  #emapplot(hiTE_go_BP,showCategory = 30)
+  #cnetplot(hiTE_go_BP,showCategory = 5)
+  ## extreme high
+  ehE_hT_go_BP = enrichGO(
+    gene = ehE_hT_entID$ENTREZID, 
     keyType = "ENTREZID",
-    OrgDb = Bacillus.OrgDb,        
+    OrgDb = OrgDb,        
+    ont = "BP",                    # Can also be a kind of CC,BP,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE) 
+  head(ehE_hT_go_BP)
+  write.table(ehE_hT_go_BP,file = paste0(name,"_ehE_hT_BP_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_ehE_hT_BPdot.svg"))
+  dotplot(ehE_hT_go_BP,title = "EnrichGO_BP_dot")
+  dev.off()
+  svg(filename = paste0(name,"_ehE_hT_BPbar.svg"))
+  barplot(ehE_hT_go_BP,showCategory = 10,title = "EnrichmentGO_BP_bar")
+  dev.off()
+  #plotGOgraph(ehE_hT_go_BP)
+  #.rs.restartR()                    # if occur error 
+  svg(filename = paste0(name,"_ehE_hT_BPgoplot.svg"))
+  goplot(ehE_hT_go_BP)
+  dev.off()
+  ## high expression and high translation
+  hE_hT_go_BP = enrichGO(
+    gene = hE_hT_entID$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = OrgDb,        
+    ont = "BP",                    # Can also be a kind of CC,BP,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE) 
+  head(hE_hT_go_BP)
+  write.table(hE_hT_go_BP,file = paste0(name,"_hE_hT_BP_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_hE_hT_BPdot.svg"))
+  dotplot(hE_hT_go_BP,title = "EnrichGO_BP_dot")
+  dev.off()
+  svg(filename = paste0(name,"_hE_hT_BPbar.svg"))
+  barplot(hE_hT_go_BP,showCategory = 10,title = "EnrichmentGO_BP_bar")
+  dev.off()
+  #plotGOgraph(hE_hT_go_BP)
+  #.rs.restartR()                    # if occur error 
+  svg(filename = paste0(name,"_hE_hT_BPgoplot.svg"))
+  goplot(hE_hT_go_BP)
+  dev.off()
+  ## low expression and low translation
+  lE_lT_go_BP = enrichGO(
+    gene = lE_lT_entID$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = OrgDb,        
+    ont = "BP",                    # Can also be a kind of CC,BP,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE) 
+  head(lE_lT_go_BP)
+  write.table(lE_lT_go_BP,file = paste0(name,"_lE_lT_BP_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_lE_lT_BPdot.svg"))
+  dotplot(lE_lT_go_BP,title = "EnrichGO_BP_dot")
+  dev.off()
+  svg(filename = paste0(name,"_lE_lT_BPbar.svg"))
+  barplot(lE_lT_go_BP,showCategory = 10,title = "EnrichmentGO_BP_bar")
+  dev.off()
+  #plotGOgraph(lE_lT_go_BP)
+  #.rs.restartR()                    # if occur error 
+  svg(filename = paste0(name,"_lE_lT_BPgoplot.svg"))
+  goplot(lE_lT_go_BP)
+  dev.off()
+  #********************************CC(Cellular Component)*******************************
+  ## high TE
+  hiTE_go_CC = enrichGO(
+    gene = hiTE_entrez_id$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = OrgDb,        
     ont = "CC",                     # Can also be a kind of CC,BP,MF
     pAdjustMethod = "BH",           # other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
     pvalueCutoff = 1,            
     qvalueCutoff = 1,
     readable = TRUE) 
-  head(ogo_CC)
-  write.table(ogo_CC,"GO_CC_enrich.txt",row.names =FALSE)
-  svg(filename = "EnrichmentGO_CC_dot.svg")
-  dotplot(ogo_CC,title = "EnrichmentGO_CC_dot")
+  head(hiTE_go_CC)
+  write.table(hiTE_go_CC,paste0(name,"_hiTE_CC_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_hiTE_CCdot.svg"))
+  dotplot(hiTE_go_CC,title = "EnrichmentGO_CC_dot")
   dev.off()
-  barplot(ogo_CC,showCategory = 10,title = "EnrichmentGO_CC_bar")
-  plotGOgraph(ogo_CC)
+  svg(filename = paste0(name,"_hiTE_CCbar.svg"))
+  barplot(hiTE_go_CC,showCategory = 10,title = "EnrichmentGO_CC_bar")
+  dev.off()
+  #plotGOgraph(hiTE_go_CC)
   #.rs.restartR()                    # if occur error 
-  goplot(ogo_CC)
-  emapplot(ogo_CC,showCategory = 30)
-  cnetplot(ogo_CC,showCategory = 5)
-  #==============================================================================================
-  # GO analysis GSEA(gene set enrichment analysis)    supplement later
-  #==============================================================================================
-  #ggo_CC = gseGO(
-  #    geneList = ,           # id & fold change etc.
-  #    OrgDb = Bacillus.OrgDb,        
-  #    ont = "CC",
-  #    nPerm = 1000,
-  #    minGSSize = 100,
-  #    maxGSSize = 500,
-  #    pvalueCutoff = 0.05,
-  #    verbose = FALSE
-  # )
+  svg(filename = paste0(name,"_hiTE_CCgoplot.svg"))
+  goplot(hiTE_go_CC)
+  dev.off()
+  #emapplot(hiTE_go_CC,showCategory = 30)
+  #cnetplot(hiTE_go_CC,showCategory = 5)
+  ## extreme high
+  ehE_hT_go_CC = enrichGO(
+    gene = ehE_hT_entID$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = OrgDb,        
+    ont = "CC",                    # Can also be a kind of CC,CC,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE) 
+  head(ehE_hT_go_CC)
+  write.table(ehE_hT_go_CC,file = paste0(name,"_ehE_hT_CC_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_ehE_hT_CCdot.svg"))
+  dotplot(ehE_hT_go_CC,title = "EnrichGO_CC_dot")
+  dev.off()
+  svg(filename = paste0(name,"_ehE_hT_CCbar.svg"))
+  barplot(ehE_hT_go_CC,showCategory = 10,title = "EnrichmentGO_CC_bar")
+  dev.off()
+  #plotGOgraph(ehE_hT_go_CC)
+  #.rs.restartR()                    # if occur error 
+  svg(filename = paste0(name,"_ehE_hT_CCgoplot.svg"))
+  goplot(ehE_hT_go_CC)
+  dev.off()
+  ## high expression and high translation
+  hE_hT_go_CC = enrichGO(
+    gene = hE_hT_entID$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = OrgDb,        
+    ont = "CC",                    # Can also be a kind of CC,CC,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE) 
+  head(hE_hT_go_CC)
+  write.table(hE_hT_go_CC,file = paste0(name,"_hE_hT_CC_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_hE_hT_CCdot.svg"))
+  dotplot(hE_hT_go_CC,title = "EnrichGO_CC_dot")
+  dev.off()
+  svg(filename = paste0(name,"_hE_hT_CCbar.svg"))
+  barplot(hE_hT_go_CC,showCategory = 10,title = "EnrichmentGO_CC_bar")
+  dev.off()
+  #plotGOgraph(hE_hT_go_CC)
+  #.rs.restartR()                    # if occur error 
+  svg(filename = paste0(name,"_hE_hT_CCgoplot.svg"))
+  goplot(hE_hT_go_CC)
+  dev.off()
+  ## low expression and low translation
+  lE_lT_go_CC = enrichGO(
+    gene = lE_lT_entID$ENTREZID, 
+    keyType = "ENTREZID",
+    OrgDb = OrgDb,        
+    ont = "CC",                    # Can also be a kind of CC,CC,MF
+    pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
+    readable = TRUE) 
+  head(lE_lT_go_CC)
+  write.table(lE_lT_go_CC,file = paste0(name,"_lE_lT_CC_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_lE_lT_CCdot.svg"))
+  dotplot(lE_lT_go_CC,title = "EnrichGO_CC_dot")
+  dev.off()
+  svg(filename = paste0(name,"_lE_lT_CCbar.svg"))
+  barplot(lE_lT_go_CC,showCategory = 10,title = "EnrichmentGO_CC_bar")
+  dev.off()
+  #plotGOgraph(lE_lT_go_CC)
+  #.rs.restartR()                    # if occur error 
+  svg(filename = paste0(name,"_lE_lT_CCgoplot.svg"))
+  goplot(lE_lT_go_CC)
+  dev.off()
   #=====================================================================================
   # KEGG analysis
   #=====================================================================================
-  # symbol to entrez,use bioDBnet,https://biodbnet-abcc.ncifcrf.gov/db/db2db.php
-  entrez_id = read.table("symbol_entrez_id.txt",sep = "\t",quote = "",header = T)
-  KEGG_id = bitr_kegg(
-    entrez_id$Gene.ID,
+  ## high TE 
+  hiTE_KEGG_id = bitr_kegg(
+    hiTE_entrez_id$ENTREZID,
     fromType = "ncbi-geneid",
     toType = 'kegg',
-    organism='bsu')    
-  head(KEGG_id)
-  write.table(KEGG_id,file = "KEGG_id.txt",sep = '\t',quote = FALSE,
+    organism='cel')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+  head(hiTE_KEGG_id)
+  write.table(hiTE_KEGG_id,file = paste0(name,"_hiTE_KEGGid.txt"),sep = '\t',quote = FALSE,
               row.names = FALSE)
-  ke = enrichKEGG(
-    gene = KEGG_id$kegg,
+  hiTE_ke = enrichKEGG(
+    gene = hiTE_KEGG_id$kegg,
     keyType = "kegg", 
-    organism = 'bsu',         #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+    organism = 'cel',         
+    pAdjustMethod = "BH", 
+    pvalueCutoff = 0.05, 
+    qvalueCutoff = 0.2 )
+  head(hiTE_ke)
+  write.table(hiTE_ke,paste0(name,"_hiTE_KEGG_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_hiTE_KEGGdot.svg"))
+  dotplot(hiTE_ke,showCategory = 10,title="KEGG_dot")
+  dev.off()
+  svg(filename = paste0(name,"_hiTE_KEGGbar.svg"))
+  barplot(hiTE_ke,showCategory = 10,title="KEGG_bar")
+  dev.off()
+  #.rs.restartR()                    # if occur error 
+  emapplot(hiTE_ke,showCategory = 30)
+  cnetplot(hiTE_ke,showCategory = 5)
+  #browseKEGG(ke, "keggid")          # Mark enriched genes on the pathway map
+  ## extreme high RNA expression level and high translation level genes
+  ehE_hT_KEGG_id = bitr_kegg(
+    ehE_hT_entID$ENTREZID,
+    fromType = "ncbi-geneid",
+    toType = 'kegg',
+    organism='cel')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+  head(ehE_hT_KEGG_id)
+  write.table(ehE_hT_KEGG_id,file = paste0(name,"_ehE_hT_KEGGid.txt"),sep = '\t',quote = FALSE,
+              row.names = FALSE)
+  ehE_hT_ke = enrichKEGG(
+    gene = ehE_hT_KEGG_id$kegg,
+    keyType = "kegg", 
+    organism = 'cel',         
     pAdjustMethod = "BH", 
     pvalueCutoff = 1, 
     qvalueCutoff = 1 )
-  head(ke)
-  write.table(ke,"KEGG_enrich.txt",row.names =FALSE)
-  svg(filename = "KEGG_dot.svg")
-  dotplot(ke,showCategory = 10,title="KEGG_dot")
+  head(ehE_hT_ke)
+  write.table(ehE_hT_ke,paste0(name,"_ehE_hT_KEGG_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_ehE_hT_KEGGdot.svg"))
+  dotplot(ehE_hT_ke,showCategory = 10,title="KEGG_dot")
   dev.off()
-  svg(filename = "KEGG_bar.svg")
-  barplot(ke,showCategory = 10,title="KEGG_bar")
+  svg(filename = paste0(name,"_ehE_hT_KEGGbar.svg"))
+  barplot(ehE_hT_ke,showCategory = 10,title="KEGG_bar")
   dev.off()
   #.rs.restartR()                    # if occur error 
-  emapplot(ke,showCategory = 30)
-  cnetplot(ke,showCategory = 5)
-  #browseKEGG(ke, "keggid")          # Mark enriched genes on the pathway map
-  
+  emapplot(ehE_hT_ke,showCategory = 30)
+  cnetplot(ehE_hT_ke,showCategory = 5)
+  ## high RNA expression level and high translation level genes
+  hE_hT_KEGG_id = bitr_kegg(
+    hE_hT_entID$ENTREZID,
+    fromType = "ncbi-geneid",
+    toType = 'kegg',
+    organism='cel')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+  head(hE_hT_KEGG_id)
+  write.table(hE_hT_KEGG_id,file = paste0(name,"_hE_hT_KEGGid.txt"),sep = '\t',quote = FALSE,
+              row.names = FALSE)
+  hE_hT_ke = enrichKEGG(
+    gene = hE_hT_KEGG_id$kegg,
+    keyType = "kegg", 
+    organism = 'cel',         
+    pAdjustMethod = "BH", 
+    pvalueCutoff = 1, 
+    qvalueCutoff = 1 )
+  head(hE_hT_ke)
+  write.table(hE_hT_ke,paste0(name,"_hE_hT_KEGG_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_hE_hT_KEGGdot.svg"))
+  dotplot(hE_hT_ke,showCategory = 10,title="KEGG_dot")
+  dev.off()
+  svg(filename = paste0(name,"_hE_hT_KEGGbar.svg"))
+  barplot(hE_hT_ke,showCategory = 10,title="KEGG_bar")
+  dev.off()
+  #.rs.restartR()                    # if occur error 
+  emapplot(hE_hT_ke,showCategory = 30)
+  cnetplot(hE_hT_ke,showCategory = 5)
+  ## low RNA expression level and low translation level genes
+  lE_lT_KEGG_id = bitr_kegg(
+    lE_lT_entID$ENTREZID,
+    fromType = "ncbi-geneid",
+    toType = 'kegg',
+    organism='cel')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+  head(lE_lT_KEGG_id)
+  write.table(lE_lT_KEGG_id,file = paste0(name,"_lE_lT_KEGGid.txt"),sep = '\t',quote = FALSE,
+              row.names = FALSE)
+  lE_lT_ke = enrichKEGG(
+    gene = lE_lT_KEGG_id$kegg,
+    keyType = "kegg", 
+    organism = 'cel',         
+    pAdjustMethod = "BH", 
+    pvalueCutoff = 1, 
+    qvalueCutoff = 1 )
+  head(lE_lT_ke)
+  write.table(lE_lT_ke,paste0(name,"_lE_lT_KEGG_enrich.txt"),row.names =FALSE)
+  svg(filename = paste0(name,"_lE_lT_KEGGdot.svg"))
+  dotplot(lE_lT_ke,showCategory = 10,title="KEGG_dot")
+  dev.off()
+  svg(filename = paste0(name,"_lE_lT_KEGGbar.svg"))
+  barplot(lE_lT_ke,showCategory = 10,title="KEGG_bar")
+  dev.off()
+  #.rs.restartR()                    # if occur error 
+  emapplot(lE_lT_ke,showCategory = 30)
+  cnetplot(lE_lT_ke,showCategory = 5)
 }

@@ -8,18 +8,18 @@ library(ggplot2)
 library(MASS)
 species = "C_elegans_Ensl_WBcel235"
 KEGG_spe = "Caenorhabditis elegans"
-RNAseq_path = "/RNAseq1/experiment2/SRR1056314_abund.out"
+RNAseq_path = "/RNAseq2/SRR6815558_abund.out"
 RNA = read.table(paste0("/home/hp/Desktop/other_riboseq/",species,RNAseq_path),sep = "\t",header = T,quote = "")
 RNA = RNA[,-c(3,4,5,6,7)]
-setwd(paste0("~/Desktop/other_riboseq/",species,"/experiment2/aligned"))
+setwd(paste0("~/Desktop/other_riboseq/",species,"/experiment3/aligned_ri"))
 dir.create("ribo_num")
 ribo_array = list.files(getwd(),pattern = ".out$")
 ribo_array
 for (i in ribo_array){
   if(FALSE) # examination
     { 
-    ribo = read.table("SRR1804340_abund.out",sep = "\t",header = T,quote = "")
-    name = "SRR1804340_abund.out"
+    ribo = read.table("SRR5026589_abund.out",sep = "\t",header = T,quote = "")
+    name = "SRR5026589_abund.out"
     name = sub("^([^.]*).*", "\\1",name)
     name = gsub("_abund","",name)
   }
@@ -96,9 +96,9 @@ for (i in ribo_array){
   #tmp <- cor(df$TPM,df$ribo_TPM)
   #tmp[upper.tri(tmp)] <- 0
   #data.new <- df[,!apply(tmp,2,function(x) any(x < 0.6))] #something wrong
-  ehE_hT <- subset(x = df,subset = TPM>10^3 & ribo_TPM>10^3,select = c(Gene_name,TPM,ribo_TPM))
-  hE_hT <- subset(x = df,subset = TPM>10^3 & ribo_TPM>55,select = c(Gene_name,TPM,ribo_TPM))
-  lE_lT <- subset(x =df,subset = TPM<.3 & ribo_TPM<.3,select = c(Gene_name,TPM,ribo_TPM))
+  ehE_hT <- subset(x = df,subset = TPM>10^3 & ribo_TPM>10,select = c(Gene_name,TPM,ribo_TPM))
+  hE_hT <- subset(x = df,subset = TPM>3*10^2 & ribo_TPM>3,select = c(Gene_name,TPM,ribo_TPM))
+  lE_lT <- subset(x =df,subset = .01<TPM & TPM<.1 & ribo_TPM<.1,select = c(Gene_name,TPM,ribo_TPM))
   write.table(ehE_hT,file = paste0("./ribo_num/",name,"_ehiE_ht_gene.txt"),sep = "\t",quote = FALSE,
               row.names = F)
   write.table(hE_hT,file = paste0("./ribo_num/",name,"_hiE_ht_gene.txt"),sep = "\t",quote = FALSE,
@@ -199,6 +199,7 @@ for (i in ribo_array){
   svg(filename = paste0(name,"_ehE_hT_ALLbar.svg"))
   barplot(ehE_hT_go_all,showCategory = 10,title = "EnrichmentGO_all_bar")
   dev.off()
+  dev.new()
   ## high RNA expression level and high translation level genes
   hE_hT_go_all = enrichGO(
     gene = hE_hT_entID$ENTREZID, 
@@ -254,6 +255,7 @@ for (i in ribo_array){
   svg(filename = paste0(name,"_hiTE_MFbar.svg"))
   barplot(hiTE_go_MF,showCategory = 10,title = "EnrichmentGO_MF_bar")
   dev.off()
+  dev.new()
   #plotGOgraph(hiTE_go_MF)
   #.rs.restartR()                    # if occur error 
   svg(filename = paste0(name,"_hiTE_MFgoplot.svg"))
@@ -458,8 +460,8 @@ for (i in ribo_array){
     OrgDb = OrgDb,        
     ont = "CC",                    # Can also be a kind of CC,CC,MF
     pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
-    pvalueCutoff = 0.05,            
-    qvalueCutoff = 0.2,
+    pvalueCutoff = 1,            
+    qvalueCutoff = 1,
     readable = TRUE) 
   head(ehE_hT_go_CC)
   write.table(ehE_hT_go_CC,file = paste0(name,"_ehE_hT_CC_enrich.txt"),row.names =FALSE)
@@ -481,8 +483,8 @@ for (i in ribo_array){
     OrgDb = OrgDb,        
     ont = "CC",                    # Can also be a kind of CC,CC,MF
     pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
-    pvalueCutoff = 0.05,            
-    qvalueCutoff = 0.2,
+    pvalueCutoff = 1,            
+    qvalueCutoff = 1,
     readable = TRUE) 
   head(hE_hT_go_CC)
   write.table(hE_hT_go_CC,file = paste0(name,"_hE_hT_CC_enrich.txt"),row.names =FALSE)
@@ -504,8 +506,8 @@ for (i in ribo_array){
     OrgDb = OrgDb,        
     ont = "CC",                    # Can also be a kind of CC,CC,MF
     pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
-    pvalueCutoff = 0.05,            
-    qvalueCutoff = 0.2,
+    pvalueCutoff = 1,            
+    qvalueCutoff = 1,
     readable = TRUE) 
   head(lE_lT_go_CC)
   write.table(lE_lT_go_CC,file = paste0(name,"_lE_lT_CC_enrich.txt"),row.names =FALSE)

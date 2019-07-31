@@ -1,0 +1,5 @@
+sed 's/   /\t/g' 48_hE_hT_sequence_acid2.txt > tmp.txt
+sed -i 's/  /\t/g' tmp.txt
+sed -i 's/\t\t\t\t/\t/g' tmp.txt
+sed -i 's/ /\t/g' tmp.txt
+sed -i 's/\t\t/\t/g' tmp.txt

@@ -1,7 +1,8 @@
 #!/bin/bash
-mkdir clipper_fastq2
+mkdir ../clipper_fastq
 for item in $(ls *.sra)
 do
 	echo "clipper_${item%.*}"
-	fastx_clipper -a TGGAATT -l 20 -d 0 -Q 33 -i ./fastq/${item%.*}.sra.fastq -o ./clipper_fastq2/${item%.*}_tri.fastq
+	fastx_clipper -a CTGTAGGCA -l 20 -d 0 -Q 33 -i ./${item%.*}.sra.fastq -o ../clipper_fastq/${item%.*}_tri.fastq
 done
+

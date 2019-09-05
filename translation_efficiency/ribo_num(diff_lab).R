@@ -1,5 +1,5 @@
 #============================================================================================== 
-# 2019-7-29.Author:Dong Yingying.Roughly  observe the translation efficiency.
+# 2019-7-29.Modified date:2019-9-5.Author:Dong Yingying.Roughly  observe the translation efficiency.
 # Translation efficiency is subtracted from the TPM value quantified by a sample of 
 # RNAseq transcripts and the corresponding TPM value of the RIBO-seq transcript(different lab).
 # And take out genes that express high expression and high translation level.
@@ -8,18 +8,18 @@ library(ggplot2)
 library(MASS)
 species = "C_elegans_Ensl_WBcel235"
 KEGG_spe = "Caenorhabditis elegans"
-RNAseq_path = "/RNAseq2/SRR6815558_abund.out"
+RNAseq_path = "/RNAseq1/experiment2/SRR1056314_abund.out"
 RNA = read.table(paste0("/home/hp/Desktop/other_riboseq/",species,RNAseq_path),sep = "\t",header = T,quote = "")
 RNA = RNA[,-c(3,4,5,6,7)]
-setwd(paste0("~/Desktop/other_riboseq/",species,"/experiment3/aligned_ri"))
+setwd(paste0("~/Desktop/other_riboseq/",species,"/experiment2/aligned"))
 dir.create("ribo_num")
 ribo_array = list.files(getwd(),pattern = ".out$")
 ribo_array
 for (i in ribo_array){
   if(FALSE) # examination
     { 
-    ribo = read.table("SRR5026589_abund.out",sep = "\t",header = T,quote = "")
-    name = "SRR5026589_abund.out"
+    ribo = read.table("SRR1804340_abund.out",sep = "\t",header = T,quote = "")
+    name = "SRR1804340_abund.out"
     name = sub("^([^.]*).*", "\\1",name)
     name = gsub("_abund","",name)
   }
@@ -93,12 +93,30 @@ for (i in ribo_array){
   df <- data.frame(only_protein_num$Gene.Name,only_protein_num$TPM,only_protein_num$ribo_TPM)
   gene_id = only_protein_num$Gene.Name
   names(df) = c("Gene_name","TPM","ribo_TPM")
+  threshhold <- 1
+  df = subset(df, df[,2] > threshhold) 
+  df = subset(df, df[,3] > threshhold)
   #tmp <- cor(df$TPM,df$ribo_TPM)
   #tmp[upper.tri(tmp)] <- 0
   #data.new <- df[,!apply(tmp,2,function(x) any(x < 0.6))] #something wrong
-  ehE_hT <- subset(x = df,subset = TPM>10^3 & ribo_TPM>10,select = c(Gene_name,TPM,ribo_TPM))
-  hE_hT <- subset(x = df,subset = TPM>3*10^2 & ribo_TPM>3,select = c(Gene_name,TPM,ribo_TPM))
-  lE_lT <- subset(x =df,subset = .01<TPM & TPM<.1 & ribo_TPM<.1,select = c(Gene_name,TPM,ribo_TPM))
+  qRNA = quantile(df$TPM,probs = seq(0,1,0.01))
+  qRNA
+  hiRNA = df[df$TPM > qRNA[97],]    #TOP 4%
+  loRNA = df[df$TPM < qRNA[5],]     #BOTTOM 4%
+  qRIBO = quantile(df$ribo_TPM,probs = seq(0,1,0.01))
+  qRIBO
+  hiRIBO = df[df$ribo_TPM > qRIBO[97],]    #TOP 4%
+  other_ribo = df[df$ribo_TPM < qRIBO[97],]    #In order to compare the differences between other ribosomal genes and high expression of high translation ribosomal genes. 
+  loRIBO = df[df$ribo_TPM < qRIBO[5],]     #BOTTOM 4%
+  hE_hT <- merge(hiRNA,hiRIBO,all = F)  #TOP4% mRNA level and top4% RIBOseq level,intersection.
+  lE_lT <- merge(loRNA,loRIBO,all = F)
+  ehE_hT <- subset(x = df,subset = TPM>10^3 & ribo_TPM>10^3,select = c(Gene_name,TPM,ribo_TPM))
+  #hE_hT <- subset(x = df,subset = TPM>10^3 & ribo_TPM>55,select = c(Gene_name,TPM,ribo_TPM))
+  #lE_lT <- subset(x =df,subset = TPM<.3 & ribo_TPM<.3,select = c(Gene_name,TPM,ribo_TPM))
+  write.table(hE_hT_def,file = paste0("./ribo_num/",name,"_hE_ht_def_gene.txt"),sep = "\t",quote = FALSE,
+              row.names = F)
+  write.table(lE_lT_def,paste0("./ribo_num/",name,"_lE_lT_def_gene.txt"),sep = "\t",quote = FALSE,
+              row.names = F)
   write.table(ehE_hT,file = paste0("./ribo_num/",name,"_ehiE_ht_gene.txt"),sep = "\t",quote = FALSE,
               row.names = F)
   write.table(hE_hT,file = paste0("./ribo_num/",name,"_hiE_ht_gene.txt"),sep = "\t",quote = FALSE,
@@ -163,6 +181,29 @@ for (i in ribo_array){
   # GO analysis ORA(over-representation analysis)
   #==============================================================================================
   #**************all(Biological Process,Cellular Component,Molecular Function)*******************
+  if(FALSE) # something wrong,modify it later
+  {
+  GO_all <- {
+    go_all = enrichGO(
+      gene = y, 
+      keyType = "ENTREZID",
+      OrgDb = OrgDb,        
+      ont = "ALL",                    # Can also be a kind of CC,BP,MF
+      pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+      pvalueCutoff = 0.05,            
+      qvalueCutoff = 0.2,
+      readable = TRUE)                # ID to Symbol,easy to read
+    #head(paste0(go_all,2))
+    write.table(go_all,file = paste0(name,"_",x,"_aLL_enrich.txt"),row.names =FALSE)
+    svg(filename = paste0(name,"_",x,"_ALLdot.svg"))
+    dotplot(go_all,title = "EnrichmentGO_all_dot")
+    dev.off()
+    svg(filename = paste0(name,"_",x,"_ALLbar.svg"))
+    barplot(go_all,showCategory = 10,title = "EnrichmentGO_all_bar")
+    dev.off()
+  }
+  GO_all("hiTE",hiTE_entrez_id$ENTREZID)  ## high TE
+  }
   ## high TE
   hiTE_go_all = enrichGO(
     gene = hiTE_entrez_id$ENTREZID, 
@@ -199,7 +240,6 @@ for (i in ribo_array){
   svg(filename = paste0(name,"_ehE_hT_ALLbar.svg"))
   barplot(ehE_hT_go_all,showCategory = 10,title = "EnrichmentGO_all_bar")
   dev.off()
-  dev.new()
   ## high RNA expression level and high translation level genes
   hE_hT_go_all = enrichGO(
     gene = hE_hT_entID$ENTREZID, 
@@ -255,7 +295,6 @@ for (i in ribo_array){
   svg(filename = paste0(name,"_hiTE_MFbar.svg"))
   barplot(hiTE_go_MF,showCategory = 10,title = "EnrichmentGO_MF_bar")
   dev.off()
-  dev.new()
   #plotGOgraph(hiTE_go_MF)
   #.rs.restartR()                    # if occur error 
   svg(filename = paste0(name,"_hiTE_MFgoplot.svg"))
@@ -460,8 +499,8 @@ for (i in ribo_array){
     OrgDb = OrgDb,        
     ont = "CC",                    # Can also be a kind of CC,CC,MF
     pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
-    pvalueCutoff = 1,            
-    qvalueCutoff = 1,
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
     readable = TRUE) 
   head(ehE_hT_go_CC)
   write.table(ehE_hT_go_CC,file = paste0(name,"_ehE_hT_CC_enrich.txt"),row.names =FALSE)
@@ -483,8 +522,8 @@ for (i in ribo_array){
     OrgDb = OrgDb,        
     ont = "CC",                    # Can also be a kind of CC,CC,MF
     pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
-    pvalueCutoff = 1,            
-    qvalueCutoff = 1,
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
     readable = TRUE) 
   head(hE_hT_go_CC)
   write.table(hE_hT_go_CC,file = paste0(name,"_hE_hT_CC_enrich.txt"),row.names =FALSE)
@@ -506,8 +545,8 @@ for (i in ribo_array){
     OrgDb = OrgDb,        
     ont = "CC",                    # Can also be a kind of CC,CC,MF
     pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
-    pvalueCutoff = 1,            
-    qvalueCutoff = 1,
+    pvalueCutoff = 0.05,            
+    qvalueCutoff = 0.2,
     readable = TRUE) 
   head(lE_lT_go_CC)
   write.table(lE_lT_go_CC,file = paste0(name,"_lE_lT_CC_enrich.txt"),row.names =FALSE)

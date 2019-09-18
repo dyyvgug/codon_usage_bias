@@ -1,5 +1,5 @@
-#2019-9-15.DYY.The ribosome-encoding gene in the gene with high expression of high translational 
-# crossover and the ribosome encoding gene in other genes except this part of the gene were 
+#2019-9-15.DYY.The ribosome-encoding gene in the gene with high expression high translation 
+# and the ribosome encoding gene in other genes except this part of the gene were 
 # observed, and the difference of TPM value and TPM value of gene expression between 
 # the two groups of ribosomal genes was observed.
 species = "C_elegans_Ensl_WBcel235"

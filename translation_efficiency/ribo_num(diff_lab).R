@@ -1,11 +1,12 @@
 #============================================================================================== 
-# 2019-7-29.Modified date:2019-9-5.Author:Dong Yingying.Roughly  observe the translation efficiency.
+# 2019-7-29.Modified date:2019-9-18.Author:Dong Yingying.Roughly  observe the translation efficiency.
 # Translation efficiency is subtracted from the TPM value quantified by a sample of 
 # RNAseq transcripts and the corresponding TPM value of the RIBO-seq transcript(different lab).
 # And take out genes that express high expression and high translation level.
 #==============================================================================================
 library(ggplot2)
 library(MASS)
+library(scales)
 species = "C_elegans_Ensl_WBcel235"
 KEGG_spe = "Caenorhabditis elegans"
 RNAseq_path = "/RNAseq1/experiment2/SRR1056314_abund.out"
@@ -90,32 +91,34 @@ for (i in ribo_array){
   #==================================================================================================================
   # Take out genes that express high expression and high translation level
   #==================================================================================================================
-  df <- data.frame(only_protein_num$Gene.Name,only_protein_num$TPM,only_protein_num$ribo_TPM)
-  gene_id = only_protein_num$Gene.Name
-  names(df) = c("Gene_name","TPM","ribo_TPM")
+  df <- data.frame(only_protein_num$Gene.ID,only_protein_num$Gene.Name,only_protein_num$TPM,only_protein_num$ribo_TPM)
+  #gene_id = only_protein_num$Gene.Name
+  names(df) = c("Gene_ID","Gene_name","TPM","ribo_TPM")
   threshhold <- 1
-  df = subset(df, df[,2] > threshhold) 
-  df = subset(df, df[,3] > threshhold)
+  df = subset(df, df[,3] > threshhold) 
+  df = subset(df, df[,4] > threshhold)
   #tmp <- cor(df$TPM,df$ribo_TPM)
   #tmp[upper.tri(tmp)] <- 0
   #data.new <- df[,!apply(tmp,2,function(x) any(x < 0.6))] #something wrong
   qRNA = quantile(df$TPM,probs = seq(0,1,0.01))
   qRNA
   hiRNA = df[df$TPM > qRNA[97],]    #TOP 4%
-  loRNA = df[df$TPM < qRNA[5],]     #BOTTOM 4%
+  loRNA = df[df$TPM < qRNA[7],]     #BOTTOM 6%
   qRIBO = quantile(df$ribo_TPM,probs = seq(0,1,0.01))
   qRIBO
   hiRIBO = df[df$ribo_TPM > qRIBO[97],]    #TOP 4%
   other_ribo = df[df$ribo_TPM < qRIBO[97],]    #In order to compare the differences between other ribosomal genes and high expression of high translation ribosomal genes. 
-  loRIBO = df[df$ribo_TPM < qRIBO[5],]     #BOTTOM 4%
+  loRIBO = df[df$ribo_TPM < qRIBO[7],]     #BOTTOM 6%
   hE_hT <- merge(hiRNA,hiRIBO,all = F)  #TOP4% mRNA level and top4% RIBOseq level,intersection.
   lE_lT <- merge(loRNA,loRIBO,all = F)
   ehE_hT <- subset(x = df,subset = TPM>10^3 & ribo_TPM>10^3,select = c(Gene_name,TPM,ribo_TPM))
   #hE_hT <- subset(x = df,subset = TPM>10^3 & ribo_TPM>55,select = c(Gene_name,TPM,ribo_TPM))
   #lE_lT <- subset(x =df,subset = TPM<.3 & ribo_TPM<.3,select = c(Gene_name,TPM,ribo_TPM))
-  write.table(hE_hT_def,file = paste0("./ribo_num/",name,"_hE_ht_def_gene.txt"),sep = "\t",quote = FALSE,
-              row.names = F)
-  write.table(lE_lT_def,paste0("./ribo_num/",name,"_lE_lT_def_gene.txt"),sep = "\t",quote = FALSE,
+  #write.table(hE_hT_def,file = paste0("./ribo_num/",name,"_hE_ht_def_gene.txt"),sep = "\t",quote = FALSE,
+  #            row.names = F)
+  #write.table(lE_lT_def,paste0("./ribo_num/",name,"_lE_lT_def_gene.txt"),sep = "\t",quote = FALSE,
+  #            row.names = F)
+  write.table(other_ribo,file = paste0("./ribo_num/",name,"_other_ribo_gene.txt"),sep = "\t",quote = FALSE,
               row.names = F)
   write.table(ehE_hT,file = paste0("./ribo_num/",name,"_ehiE_ht_gene.txt"),sep = "\t",quote = FALSE,
               row.names = F)
@@ -123,6 +126,8 @@ for (i in ribo_array){
               row.names = F)
   write.table(lE_lT,file = paste0("./ribo_num/",name,"_lE_lT_gene.txt"),sep = "\t",quote = FALSE,
               row.names = F )
+  write.table(hE_hT$Gene_ID,file = paste0("./ribo_num/",name,"_hE_hT_only_geneID.txt"),sep = "\t",quote = FALSE,
+              row.names = F,col.names = F)
   #======================================================================================================
   # GO and KEGG analyze high translation efficiency genes,high RNA level & high translation level genes,
   # low RNA level & low translation level genes.
@@ -181,27 +186,27 @@ for (i in ribo_array){
   # GO analysis ORA(over-representation analysis)
   #==============================================================================================
   #**************all(Biological Process,Cellular Component,Molecular Function)*******************
-  if(FALSE) # something wrong,modify it later
-  {
-  GO_all <- {
-    go_all = enrichGO(
-      gene = y, 
-      keyType = "ENTREZID",
-      OrgDb = OrgDb,        
-      ont = "ALL",                    # Can also be a kind of CC,BP,MF
-      pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
-      pvalueCutoff = 0.05,            
-      qvalueCutoff = 0.2,
-      readable = TRUE)                # ID to Symbol,easy to read
-    #head(paste0(go_all,2))
-    write.table(go_all,file = paste0(name,"_",x,"_aLL_enrich.txt"),row.names =FALSE)
-    svg(filename = paste0(name,"_",x,"_ALLdot.svg"))
-    dotplot(go_all,title = "EnrichmentGO_all_dot")
-    dev.off()
-    svg(filename = paste0(name,"_",x,"_ALLbar.svg"))
-    barplot(go_all,showCategory = 10,title = "EnrichmentGO_all_bar")
-    dev.off()
-  }
+  if(FALSE) {                             # something wrong,modify it later
+    GO_all <- function(x,y)     {
+        go_all = enrichGO(
+          gene = y, 
+          keyType = "ENTREZID",
+          OrgDb = OrgDb,        
+          ont = "ALL",                    # Can also be a kind of CC,BP,MF
+          pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+          pvalueCutoff = 0.05,            
+          qvalueCutoff = 0.2,
+          readable = TRUE)                # ID to Symbol,easy to read
+        #head(paste0(go_all,2))
+        write.table(go_all,file = paste0(name,"_",x,"_aLL_enrich.txt"),row.names =FALSE)
+        svg(filename = paste0(name,"_",x,"_ALLdot.svg"))
+        dotplot(go_all, x = "Count", title = "EnrichmentGO_all_dot")
+        dev.off()
+        png("test.png")
+        #svg(filename = paste0(name,"_",x,"_ALLbar.svg"))
+        barplot(go_all,showCategory = 10,title = "EnrichmentGO_all_bar")
+        dev.off()
+      }
   GO_all("hiTE",hiTE_entrez_id$ENTREZID)  ## high TE
   }
   ## high TE

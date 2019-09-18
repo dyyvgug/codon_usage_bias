@@ -1,3 +1,7 @@
+#2019-9-15.DYY.The ribosome-encoding gene in the gene with high expression of high translational 
+# crossover and the ribosome encoding gene in other genes except this part of the gene were 
+# observed, and the difference of TPM value and TPM value of gene expression between 
+# the two groups of ribosomal genes was observed.
 species = "C_elegans_Ensl_WBcel235"
 setwd(paste0("~/Desktop/other_riboseq/",species,"/experiment2/aligned/ribo_num"))
 other_ribo_gene = read.table("40_other_ribo_filter.txt")
@@ -15,3 +19,4 @@ png("40_compare_ribo_riboTPM.png")
 p <- boxplot(log(other_ribo_gene$ribo_TPM),log(hE_hT_ribo_gene$ribo_TPM),
              names=c('OTHER','hiEXPhiTRA'),col=c("green","red"),ylab = 'log(TPM)')
 dev.off()
+

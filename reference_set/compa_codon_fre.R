@@ -15,11 +15,14 @@ dev.off()
 library(pheatmap)
 
 codon_fre_diff = read.table("40_codon_fre_dif.csv",header = T,sep = ',',quote = "")
-codon_fre_diff = codon_fre_diff[,-c(1,3,5)]
+codon_fre_diff = codon_fre_diff[,-c(1,3,5,7,9,11,13)]
 rownames(codon_fre_diff) = codon_fre_diff[,1]
 codon_fre_diff = codon_fre_diff[-1]
-colnames(codon_fre_diff) = c("h_codon_fre","l_codon_fre")
+colnames(codon_fre_diff) = c("h_codon_fre","l_codon_fre","g_codon_fre",
+                             "CDS_codon_fre","h_ribo_codon_fre","h_remove_ribo_codon_fre")
 dev.new()
 jpeg("40_codon_fre_dif.jpg",width = 600, height = 1200, quality = 100)
-pheatmap(codon_fre_diff,color = colorRampPalette(c("navy", "white", "firebrick3"))(50))
+pheatmap(codon_fre_diff,cluster_row = FALSE,color = colorRampPalette(c("red", "black", "green"))(50))
+pheatmap(codon_fre_diff,cluster_cols = FALSE,color = colorRampPalette(c("red", "black", "green"))(50))
 dev.off() 
+

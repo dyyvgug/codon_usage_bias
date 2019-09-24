@@ -1,7 +1,7 @@
 #============================================================================================== 
 # 2019-7-29.Modified date:2019-9-23.Author:Dong Yingying.Roughly  observe the translation efficiency.
 # Translation efficiency is subtracted from the TPM value quantified by a sample of 
-# RNAseq transcripts and the corresponding TPM value of the RIBO-seq transcript(different lab).
+# RNAseq transcripts and the corresponding TPM value of the RIBO-seq transcript(same lab).
 # And take out genes that express high expression and high translation level.
 #==============================================================================================
 library(ggplot2)

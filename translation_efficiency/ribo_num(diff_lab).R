@@ -36,7 +36,7 @@ for (i in ribo_array){
   ribo_num = round(RNA_ribo$ribo_TPM / RNA_ribo$TPM,3)
   RNA_ribo_num = cbind(RNA_ribo,ribo_num)
   RNA_ribo_num = RNA_ribo_num[order(RNA_ribo_num$ribo_num,decreasing = T),]
-  RNA_ribo_num$Gene.ID = gsub("_.*", "", RNA_ribo_num[,1])
+  #RNA_ribo_num$Gene.ID = gsub("_.*", "", RNA_ribo_num[,1])
   write.table(RNA_ribo_num,file = paste0("./ribo_num/",name,"_riboNum.txt"),
               sep = "\t",quote = F,row.names = F)
   #=================================================================================================================

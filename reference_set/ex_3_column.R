@@ -1,0 +1,6 @@
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) 
+list.files(getwd())
+t = list.files(getwd(),pattern = ".[txt]$")
+a = read.table(t,sep = '\t',quote = '',header = F)
+b = data.frame(a$V3)
+write.table(b,file = 'MF_only_symbol.txt',sep = '\t',quote = F,row.names = F,col.names = F)

@@ -94,6 +94,7 @@ for (i in ribo_array){
   df <- data.frame(only_protein_num$Gene.ID,only_protein_num$Gene.Name,only_protein_num$TPM,only_protein_num$ribo_TPM)
   #gene_id = only_protein_num$Gene.Name
   names(df) = c("Gene_ID","Gene_name","TPM","ribo_TPM")
+  write.table(df,file = paste0(name,"_protein_TPM.txt"),sep = '\t',quote = F,col.names = T,row.names = F)
   threshhold <- 1
   df = subset(df, df[,3] > threshhold) 
   df = subset(df, df[,4] > threshhold)

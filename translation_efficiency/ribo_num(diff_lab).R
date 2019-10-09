@@ -1,5 +1,5 @@
 #============================================================================================== 
-# 2019-7-29.Modified date:2019-9-18.Author:Dong Yingying.Roughly  observe the translation efficiency.
+# 2019-7-29.Modified date:2019-9-20.Author:Dong Yingying.Roughly  observe the translation efficiency.
 # Translation efficiency is subtracted from the TPM value quantified by a sample of 
 # RNAseq transcripts and the corresponding TPM value of the RIBO-seq transcript(different lab).
 # And take out genes that express high expression and high translation level.

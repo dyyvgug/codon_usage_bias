@@ -1,5 +1,5 @@
 #================================================================================================
-# 2019-10-07.DYY.Extract GO three classification most significant set,then get their intersection,
+# 2019-10-07.Modified date:2019-10-10.DYY.Extract GO three classification most significant set,then get their intersection,
 # except the intersection between MF & BP.
 # The TPM value of the intersection gene is compared with the TPM value of the gene with high 
 # expression & high translation.
@@ -11,6 +11,7 @@ hE_hT = read.table('SRR6930636_hE_ht_gene.txt',header = T,quote = '',sep = '\t')
 names(s) = "Gene.Name"
 s_TPM = merge(s,TPM,by = "Gene.Name",all.x = T)
 s_TPM = s_TPM[complete.cases(s_TPM),]
+s_TPM = unique(s_TPM)
 
 svg('all_cc_vs_hE_hT_TPMbox.svg')
 p1 <- boxplot(s_TPM$TPM,hE_hT$TPM,TPM$TPM,log = 'y',

@@ -11,6 +11,7 @@ hE_hT = read.table('SRR1804340_hE_ht_gene.txt',header = T,quote = '',sep = '\t')
 names(s) = "Gene.Name"
 s_TPM = merge(s,TPM,by = "Gene.Name",all.x = T)
 s_TPM = s_TPM[complete.cases(s_TPM),]
+s_TPM = unique(s_TPM)
 
 svg('40_three_set_vs_hE_hT_TPMbox.svg')
 p1 <- boxplot(s_TPM$TPM,hE_hT$TPM,TPM$TPM,log = 'y',

@@ -1,4 +1,7 @@
-#2019-4-12.Correlation analysis of CAI and global gene expression in all samples.DYY.
+#========================================================================================================
+#2019-4-12.Modified date:2019-10-17.Author:Yingying Dong.Correlation analysis of CAI and 
+# global gene expression in all samples.
+#========================================================================================================
 library(getopt)
 command=matrix(c("species","s",1,"character",
                  "experiment","e",1,"numeric",

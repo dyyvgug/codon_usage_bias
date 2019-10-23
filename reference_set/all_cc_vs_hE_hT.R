@@ -33,10 +33,10 @@ s_TPM = unique(s_TPM)
 
 svg('all_cc_vs_hE_hT_TPMbox.svg')
 p1 <- boxplot(s_TPM$TPM,hE_hT$TPM,TPM$TPM,log = 'y',pch = 18,names=c('all_CC','hE_hT','global_gene'),
-              col=c("red","yellow","lightblue"),ylab = 'TPM')
+              col=c("red","yellow","lightblue"),ylab = 'TPM',boxwex = .5)
 dev.off()
 svg('all_cc_vs_hE_hT_riboTPMbox.svg')
-p2 <- boxplot(s_TPM$ribo_TPM,hE_hT$ribo_TPM,TPM$TPM,log = 'y',pch = 18,
+p2 <- boxplot(s_TPM$ribo_TPM,hE_hT$ribo_TPM,TPM$TPM,log = 'y',pch = 18,boxwex = .5,
               names=c('all_CC','hE_hT','global_gene'),col=c("red","yellow","lightblue"),ylab = 'ribo_TPM')
 dev.off()
 hE_hT_only_name = hE_hT[,-c(1,3,4)]
@@ -60,13 +60,12 @@ s_e_s_TPM = merge(s_e_s,TPM,by = "Gene.Name",all.x = T)
 s_e_s_TPM = s_e_s_TPM[complete.cases(s_e_s_TPM),]
 
 svg('CC_except_inter_TPMbox.svg')
-p3 <- boxplot(ss_TPM$TPM,h_e_s_TPM$TPM,s_e_s_TPM$TPM,TPM$TPM,log = 'y',pch = 18,
+p3 <- boxplot(ss_TPM$TPM,h_e_s_TPM$TPM,s_e_s_TPM$TPM,TPM$TPM,log = 'y',pch = 18,boxwex = .5,
               names=c('inter_inter','hEhT_exc_inter','inter_exc_inter','global_gene'),
               col=c("red","yellow",'lightblue','lightgreen'),ylab = 'TPM')
 dev.off()
 svg('CC_except_inter_riboTPMbox.svg')
 p4 <- boxplot(ss_TPM$ribo_TPM,h_e_s_TPM$ribo_TPM,s_e_s_TPM$ribo_TPM,TPM$ribo_TPM,log = 'y',pch = 18,
               names=c('inter_inter','hEhT_exc_inter','inter_exc_inter','global_gene'),
-              col=c("red","yellow",'lightblue','lightgreen'),ylab = 'riboTPM')
+              col=c("red","yellow",'lightblue','lightgreen'),ylab = 'riboTPM',boxwex = .5)
 dev.off()
-

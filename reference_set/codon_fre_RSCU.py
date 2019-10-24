@@ -3,6 +3,7 @@
 # Yingying Dong.Modified date:2019-10-24.
 # This program calculates codon frequency,RSCU value in the gene FASTA sequence file
 #  of high RNAseq TPM and high Ribo-seq TPM.
+import sys
 
 aa_codon = {
     'A':['GCT','GCC','GCA','GCG'],'C':['TGT','TGC'],
@@ -53,8 +54,8 @@ def calc_freq(codon_count,out_file):
                 RSCU = 0.0
             out_file.write('{:>4}\t{:>5}\t{:>4}\t{:>5.3f}\t{:<5.3f}\n'.format(aa,codon,codon_count[codon],freq,RSCU))
 
-in_file = open('40_hE_hT_seq(no_utr).fa','r')
-out_file = open('hE_hT_codon_fre_RSCU.txt','w')
+in_file = open(sys.argv[1],'r')
+out_file = open('{}_codon_fre_RSCU.txt'.format(sys.argv[2]),'w')
 
 # Reads the DNA sequence into a single string.
 dna = ''

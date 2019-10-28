@@ -33,11 +33,13 @@ for line in fa_file:
 			codon = dna[j:j + 3]
 			if codon in codon_weight:
 				weight_list.append(codon_weight[codon])
-		#print(weight_list)
 		print(header)
+		#print(weight_list)
 		CAI = stats.gmean(weight_list)
 		CAI_file.write('{}\t{}\n'.format(header, CAI))
 		header = line.strip()
+		dna = ''
+		weight_list = []
 
 fa_file.close()
 CAI_file.close()

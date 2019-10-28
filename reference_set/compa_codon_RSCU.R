@@ -8,8 +8,9 @@ species = "C_elegans_Ensl_WBcel235"
 setwd(paste0("~/Desktop/other_riboseq/",species,"/experiment2/aligned/ribo_num"))
 hE_hT_gene_fre = read.table("hE_hT_codon_fre_RSCU.txt",header = T,sep = '\t',quote = "")
 df <- hE_hT_gene_fre
-df$Weights <- ave(df$RSCU,df$AA,FUN=function(x) x/max(x))
-write.table(df,file = "hE_hT_RSCU_weight.txt",sep = '\t',quote = F,row.names = F) # calculate weight
+df$Weights <- ave(df$RSCU,df$AA,FUN=function(x) x/max(x)) # calculate weight
+df = df[,-c(1,3,4,5)]
+write.table(df,file = "hE_hT_RSCU_weight.txt",sep = '\t',quote = F,row.names = F,col.names = F) # for calculate CAI
 
 lE_lT_gene_fre = read.table("lE_lT_codon_fre_RSCU.txt",header = T,sep = '\t',quote = "")
 global_gene = read.table(paste0("/media/hp/disk1/DYY/reference/annotation/",species,"/ref/CDS_codon_fre_RSCU.txt")

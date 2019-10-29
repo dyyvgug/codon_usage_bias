@@ -68,16 +68,8 @@ ggplot(only_protein_num,aes(x = TPM ,y = ribo_TPM))+
   scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
                 labels = trans_format("log10", math_format(10^.x))) +
   annotation_logticks(sides="bl")+
-  stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "blue",size = 0.75)+
-  theme(
-    panel.background = element_rect(fill = "lightblue",
-                                    colour = "lightblue",
-                                    size = 0.5, linetype = "solid"),
-    panel.grid.major = element_line(size = 0.5, linetype = 'solid',
-                                    colour = "white"), 
-    panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
-                                    colour = "white")
-  )
+  stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "red",size = 0.75)+
+  theme_bw()
 dev.off()
 write.table(co_RNA_ri,file = "cor_RNA_ri.txt",sep = '\t',append = T,quote = FALSE,
             row.names = F, col.names = F)
@@ -113,6 +105,8 @@ ehE_hT <- subset(x = df,subset = TPM>10^2 & ribo_TPM>8,select = c(Gene_name,TPM,
 #            row.names = F)
 #write.table(lE_lT_def,paste0("./ribo_num/",name,"_lE_lT_def_gene.txt"),sep = "\t",quote = FALSE,
 #            row.names = F)
+write.table(hE_hT$Gene_name,file = paste0("./ribo_num/",name,"_hE_hT_only_name.txt"),sep = "\n",quote = FALSE,
+            row.names = F,col.names = F)                
 write.table(other_ribo,file = paste0("./ribo_num/",name,"_other_ribo_gene.txt"),sep = "\t",quote = FALSE,
             row.names = F)
 write.table(ehE_hT,file = paste0("./ribo_num/",name,"_ehiE_ht_gene.txt"),sep = "\t",quote = FALSE,

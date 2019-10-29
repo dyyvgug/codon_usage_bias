@@ -14,6 +14,8 @@ if (!is.null(args$help) || is.null(args$species) || is.null(args$experiment)) {
 species = args$species
 exp = args$experiment
 
+#species = "C_elegans_Ensl_WBcel235"
+#exp = "1"
 setwd(paste0("/media/hp/disk1/DYY/reference/annotation/", species))
 cai  = read.table(paste("/media/hp/disk1/DYY/reference/annotation/", 
                             species, "/ref/CAI_byJCAT.txt", sep = ""), sep = "\t", header = F,quote = '')
@@ -26,13 +28,14 @@ gtf_array
 for (i in gtf_array) {
   if(FALSE) # examination
   { 
-    gtf = read.table("SRR7508939_abund.out", sep = "\t", header=T,quote = "",fill = T)
-    name = "SRR7508939"
+    gtf = read.table("SRR6815557_abund.out", sep = "\t", header=T,quote = "",fill = T)
+    name = "SRR6815557"
   }
   #write.table(gtf$gene_id,file = "id_wait.txt",quote = F,row.names = F, col.names = F)
-  gtf = read.table(i, sep = "\t", header = T,quote = "",fill = T)
-  name = sub("^([^.]*).*", "\\1",i)
-
+  gtf = read.table(i, sep = "\t", header = T,quote = "")
+  name = sub("^([^.]*).*", "\\1",i) 
+  name = sub("_abund","",name)
+  gtf = gtf[,-c(2,3,4,5,6,7)]
   
   names(cai) = c("gene_id","CAI")
   cai$gene_id = sub(" ","",cai$gene_id)

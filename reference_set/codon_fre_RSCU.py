@@ -1,10 +1,18 @@
 #!/usr/bin/python
 #coding:utf-8
-# Yingying Dong.Modified date:2019-10-24.
+# Yingying Dong.2019-10-24.Modified date:2019-10-29.
 # This program calculates codon frequency,RSCU value in the gene FASTA sequence file
 #  of high RNAseq TPM and high Ribo-seq TPM.
-import sys
+import os,sys
+import argparse 
 
+parser = argparse.ArgumentParser(description='calculates codon frequency,RSCU value',prog='RSCU',usage='%(prog)s [options]') 
+parser.add_argument('--spe', nargs='?',type=str,help='species name' ) 
+parser.add_argument('--exp',nargs='?', type=int,help='experiment number')
+parser.add_argument('--inp', nargs='?',type=str, help='expected FASTA file of calculations RSCU') 
+args = parser.parse_args()
+ 
+os.chdir('/home/hp/Desktop/other_riboseq/{}/experiment{}/aligned_ri/ribo_num'.format(args.spe,args.exp))
 aa_codon = {
     'A':['GCT','GCC','GCA','GCG'],'C':['TGT','TGC'],
     'D':['GAT','GAC'],'E':['GAA','GAG'],'F':['TTT','TTC'],
@@ -52,10 +60,10 @@ def calc_freq(codon_count,out_file):
             else:
                 freq = 0.0
                 RSCU = 0.0
-            out_file.write('{:>4}\t{:>5}\t{:>4}\t{:>5.3f}\t{:<5.3f}\n'.format(aa,codon,codon_count[codon],freq,RSCU))
+            out_file.write('{}\t{}\t{}\t{:.3f}\t{:.3f}\n'.format(aa,codon,codon_count[codon],freq,RSCU))
 
-in_file = open(sys.argv[1],'r')
-out_file = open('{}_codon_fre_RSCU.txt'.format(sys.argv[2]),'w')
+in_file = open(args.inp,'r')
+out_file = open('hE_hT_codon_fre_RSCU.txt','w')
 
 # Reads the DNA sequence into a single string.
 dna = ''

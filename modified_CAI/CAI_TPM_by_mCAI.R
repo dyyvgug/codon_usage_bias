@@ -30,7 +30,7 @@ cai$gene_id = gsub(">gene-", "",cai$gene_id)
 dir.create(paste0("picture_bymCAI",exp))
 dir.create(paste0("correlation_bymCAI",exp))
 setwd(paste0("/media/hp/Katniss/DYY/aligned/",species,"/experiment",exp,"/"))
-gtf_array = list.files(getwd(),pattern = "SRR\\d.+out$") 
+gtf_array = list.files(getwd(),pattern = "S[E]RR\\d.+out$") 
 gtf_array
 #graphics.off()
 for (i in gtf_array) {

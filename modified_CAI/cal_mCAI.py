@@ -57,4 +57,4 @@ fa_file.close()
 CAI_file.close()
 weight_file.close()
 
-os.system('sed -i 's/>//g' {}_mCAI.txt'.format(args.spA))
+os.system('sed -i \'s/>//g\' {}_mCAI.txt'.format(args.spA))

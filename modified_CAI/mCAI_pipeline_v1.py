@@ -9,7 +9,7 @@ import argparse
 import rpy2.robjects as robjects
 from scipy import stats
 
-parser = argparse.ArgumentParser(description='gene name to gene ID', prog='nameToID', usage='%(prog)s [options]')
+parser = argparse.ArgumentParser(description='mCAI pipeline v1', prog='mCAI_CC', usage='%(prog)s [options]')
 parser.add_argument('--spe', nargs='?', type=str, help='species name')
 parser.add_argument('--spA', nargs='?', type=str, help='species name abbreviation')
 parser.add_argument('--ann', nargs='*', type=str, default='ref.gtf', help='input gtf format file')

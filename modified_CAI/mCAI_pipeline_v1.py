@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # coding:utf-8
 # =========================================================================================================
-# Yingying Dong.2019-11-4.mCAI pipeline.
+# Yingying Dong.2019-11-4.mCAI pipeline.The weight from GO class CC -- cytosolic ribosome(CC clustering of 
+#   high RNAseq TPM value genes and high RIBOseq TPM value in most species).
 # =========================================================================================================
 import os, sys
 import argparse

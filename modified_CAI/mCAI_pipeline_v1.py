@@ -139,8 +139,8 @@ in_file.close()
 out_file.close()
 
 r_script = '''
-hE_hT_gene_fre = read.table("CC_codon_fre_RSCU.txt",header = T,sep = '\t',quote = "")
-df <- hE_hT_gene_fre
+gene_fre = read.table("CC_codon_fre_RSCU.txt",header = T,sep = '\t',quote = "")
+df <- gene_fre
 df$Weights <- ave(df$RSCU,df$AA,FUN=function(x) x/max(x)) # calculate weight
 df = df[,-c(1,3,4,5)]
 df = df[-c(30,61,62,63,64),]
@@ -177,7 +177,7 @@ for line in fa_file:
             codon = dna[j:j + 3]
             if codon in codon_weight:
                 weight_list.append(codon_weight[codon])
-        print(header)
+        #print(header)
         # print(weight_list)
         CAI = stats.gmean(weight_list)
         CAI_file.write('{}\t{}\n'.format(header, CAI))

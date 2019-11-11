@@ -24,9 +24,16 @@ args = parser.parse_args()
 
 os.chdir('/media/hp/disk1/DYY/reference/annotation/{}/'.format(args.spe))
 gtf_path = '/media/hp/disk1/DYY/reference/annotation/{}/'.format(args.spe)
-gtf = open('{}{}'.format(gtf_path, args.ann), 'r')
 id_file = open('ribo_geneID.txt', 'w')
 
+os.system('cp ref.gtf refbackup.gtf')
+os.system('sed -i \'s/transcript_id ".*"; gene_id//g\' ref.gtf')
+os.system('sed -i \'s/"; gene_name "/\t/g\' ref.gtf')
+os.system('sed -i \'s/";//g\' ref.gtf')
+os.system('sed -i \'s/"//g\' ref.gtf')
+os.system('sed -i \'s/ //g\' ref.gtf')
+
+gtf = open('{}{}'.format(gtf_path, args.ann), 'r')
 DNA_path = '/media/hp/disk1/DYY/reference/annotation/{}/ref/'.format(args.spe)
 DNA = open('{}CDS_DNA.fa'.format(DNA_path), 'r')
 ex_seq = open('{}ribo_seq.fa'.format(DNA_path), 'w')
@@ -194,4 +201,3 @@ weight_file.close()
 
 os.chdir(DNA_path)
 os.system('sed -i \'s/>//g\' {}_mCAI_ribo.txt'.format(args.spA))
-

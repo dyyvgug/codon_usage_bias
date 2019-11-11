@@ -20,9 +20,9 @@ species = args$species
 exp = args$experiment
 speA_exp = args$species_abb
 
-species = "Escherichia_coli"
-exp = "1"
-speA_exp = "Ec"
+#species = "Escherichia_coli"
+#exp = "1"
+#speA_exp = "Ec"
 
 setwd(paste0("/media/hp/disk1/DYY/reference/annotation/", species))
 cai  = read.table(paste("/media/hp/disk1/DYY/reference/annotation/", 

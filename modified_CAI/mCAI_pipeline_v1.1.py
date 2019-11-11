@@ -2,7 +2,7 @@
 # coding:utf-8
 # =========================================================================================================
 # Yingying Dong.2019-11-8.mCAI pipeline v1.1.The weight from genes that product ribosomal protein.The genes
-#   name from formatted gff annotation file.
+#   name from formatted gff annotation file 
 # =========================================================================================================
 import os, sys
 import argparse

@@ -21,9 +21,6 @@ args = parser.parse_args()
 ### Get ribosomal gene ID from the gff3 annotation file.At the same time,extract their DNA sequence.
 
 os.chdir('/media/hp/disk1/DYY/reference/annotation/{}/'.format(args.spe))
-gff_path = '/media/hp/disk1/DYY/reference/annotation/{}/'.format(args.spe)
-
-gff = open('{}{}'.format(gff_path, args.ann), 'r')
 os.system('cp ref.gff refbackup.gff')
 os.system('sed -i \'s/ID.*Parent=//g\' ref.gff')
 os.system('sed -i \'s/;Dbxref.*product=/\t/g\' ref.gff')
@@ -38,7 +35,6 @@ write.table(gff$V9,file = 'ribo_geneID_u.txt', quote = FALSE,row.names = F, col.
 robjects.r(r_script1)
 
 id_file = open('ribo_geneID_u.txt', 'r')
-
 DNA_path = '/media/hp/disk1/DYY/reference/annotation/{}/ref/'.format(args.spe)
 DNA = open('{}CDS_DNA.fa'.format(DNA_path), 'r')
 ex_seq = open('{}ribo_seq.fa'.format(DNA_path), 'w')
@@ -59,8 +55,7 @@ for line in id_table:
         ex_seq.write('>' + str(line) + '\n' + str(''.join(database[line])) + '\n')
     else:
         print(line + ' Its sequence may not be coding sequence')
-
-gff.close()
+DNA.close()
 id_file.close()
 ex_seq.close()
 ### Calculates codon frequency,RSCU value,weight in the gene FASTA sequence file.

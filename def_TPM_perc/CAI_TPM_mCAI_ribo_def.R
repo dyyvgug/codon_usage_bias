@@ -1,5 +1,5 @@
 #========================================================================================================
-# 2019-11-5.Author:Yingying Dong.Correlation analysis of modified CAI and 
+# 2019-11-11.Author:Yingying Dong.Correlation analysis of modified CAI and 
 #  global gene expression in all samples.The weight from ribosome genes.
 #========================================================================================================
 library(getopt)

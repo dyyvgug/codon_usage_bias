@@ -57,6 +57,7 @@ for (i in gtf_array) {
   df4 = df[df$TPM >= q[100],] # top 1%
   df5 = df[df$TPM >= q[48],] # top 10%
   df_def = subset(df5, !df5$TPM %in%c(df4$TPM)) # Remove the a data frame from the b data frame.
+  df6 = df[df$`TPM` >= q[50],] # top 50%
   #===========================================================================
   # For all gene correlation mCAI and TPM 
   #===========================================================================
@@ -93,7 +94,7 @@ for (i in gtf_array) {
   print(p2)
   dev.off()
   #===========================================================================
-  # For Top10%Gene correlation Nc and TPM 
+  # For Top10%Gene correlation mCAI and TPM 
   #===========================================================================
   svg(file=paste0("/media/hp/disk1/DYY/reference/annotation/", species,"/picture_bymCAI_ribo",exp,"/","h_",name,"_CAI_TPM.svg"))
   high_cai_cor = cor(df3$mCAI_value,df3$TPM)
@@ -110,7 +111,7 @@ for (i in gtf_array) {
   print(p3)
   dev.off()
   #==========================================================================
-  # For 0-48%Gene correlation Nc and TPM 
+  # For 0-48%Gene correlation mCAI and TPM 
   #===========================================================================
   svg(file=paste0("/media/hp/disk1/DYY/reference/annotation/", species,"/picture_bymCAI_ribo",exp,"/","l48_",name,"_CAI_TPM.svg"))
   low_cai_cor = cor(df_l$mCAI_value,df_l$TPM)
@@ -127,7 +128,7 @@ for (i in gtf_array) {
   print(p4)
   dev.off()
   #===========================================================================
-  # For defGene correlation Nc and TPM 
+  # For defGene correlation mCAI and TPM 
   #===========================================================================
   svg(file=paste0("/media/hp/disk1/DYY/reference/annotation/", species,"/picture_bymCAI_ribo",exp,"/","def_",name,"_CAI_TPM.svg"))
   def_cai_cor = cor(df_def$mCAI_value,df_def$TPM)
@@ -144,14 +145,31 @@ for (i in gtf_array) {
   print(p5)
   dev.off()
   #===============================================================================
+  # For 50-100%Gene correlation mCAI and TPM 
+  #===============================================================================
+  svg(file=paste0("/media/hp/disk1/DYY/reference/annotation/", species,"/picture_bymCAI_ribo",exp,"/","half_",name,"_CAI_TPM.svg"))
+  half_cai_cor = cor(df6$mCAI_value,df6$TPM)
+  p6 <- ggplot(df6,aes(x = mCAI_value ,y = TPM))+
+    geom_point(shape = 16,size = 0.75)+
+    labs(title = paste0(name,"cor_half_mCAI_TPM    ","r=",half_cai_cor))+
+    scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
+                  labels = trans_format("log10", math_format(10^.x))) +
+    annotation_logticks(sides="bl")+
+    stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "red",size = 0.75)+
+    theme_bw()+
+    xlab("mCAI value")+
+    ylab("RNAseq TPM")
+  print(p6)
+  dev.off()
+  #===============================================================================
   # Write out data,convenient to calculate the average
   #===============================================================================
-  write.table(paste(CAI_cor,top_cai_cor,high_cai_cor,low_cai_cor,def_cai_cor,sep = '\t'),file = paste0
+  write.table(paste(CAI_cor,top_cai_cor,high_cai_cor,low_cai_cor,def_cai_cor,half_cai_cor,sep = '\t'),file = paste0
               ("/media/hp/disk1/DYY/reference/annotation/", 
                 species,"/correlation_bymCAI_ribo",exp,"/",name,"correlation_mCAI"),
               quote = FALSE,row.names = "correlation", 
-              col.names = "all_CAI_cor\ttop_CAI_cor\thigh_CAI_cor\tlow_CAI_cor\tdef_CAI_cor")
-  write.table(paste(CAI_cor,top_cai_cor,high_cai_cor,low_cai_cor,def_cai_cor,sep = '\t'),file = paste0
+              col.names = "all_CAI_cor\ttop_CAI_cor\thigh_CAI_cor\tlow_CAI_cor\tdef_CAI_cor\thalf_CAI_cor")
+  write.table(paste(CAI_cor,top_cai_cor,high_cai_cor,low_cai_cor,def_cai_cor,half_cai_cor,sep = '\t'),file = paste0
               ("/media/hp/disk1/DYY/reference/annotation/", 
                 species,"/correlation_bymCAI_ribo",exp,"/","allcor.txt"),append = T,quote = FALSE,
               row.names = F, col.names = F)
@@ -159,10 +177,10 @@ for (i in gtf_array) {
 
 setwd(paste0("/media/hp/disk1/DYY/reference/annotation/",species,"/correlation_bymCAI_ribo",exp,"/" ))
 a = read.table("allcor.txt",sep = '\t',header = F)
-names(a) = c("all_CAI_cor","top_CAI_cor","high_CAI_cor","low_CAI_cor","def_CAI_cor")
+names(a) = c("all_CAI_cor","top_CAI_cor","high_CAI_cor","low_CAI_cor","def_CAI_cor","half_CAI_cor")
 write.table(paste(mean(a$all_CAI_cor),mean(a$top_CAI_cor),mean(a$high_CAI_cor),
-                  mean(a$low_CAI_cor),mean(a$def_CAI_cor),sep = '\t'),file = "mean_cor.txt",
+                  mean(a$low_CAI_cor),mean(a$def_CAI_cor),mean(a$half_CAI_cor),sep = '\t'),file = "mean_cor.txt",
             quote = FALSE,row.names = "mean_mCAI_correlation", 
-            col.names = "all_CAI_cor\ttop_CAI_cor\thigh_CAI_cor\tlow_CAI_cor\tdef_CAI_cor")
+            col.names = "all_CAI_cor\ttop_CAI_cor\thigh_CAI_cor\tlow_CAI_cor\tdef_CAI_cor\thalf_CAI_cor")
 
 

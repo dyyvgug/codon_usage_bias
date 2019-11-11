@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # coding:utf-8
 # =========================================================================================================
-#  Yingying Dong.2019-11-5.mCAI pipeline v2.The weight from ribosome genes.To calculate CAI values
-#    for non-model organisms. The annotation file is formatted GTF.
+#  Yingying Dong.2019-11-5.Modified date:2019-11-11.mCAI pipeline v2.The weight from ribosome genes.
+#  To calculate CAI values for non-model organisms. The annotation file is formatted GTF.
 # =========================================================================================================
 import os
 import re

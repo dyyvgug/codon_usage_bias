@@ -11,7 +11,7 @@ import argparse
 import rpy2.robjects as robjects
 from scipy import stats
 
-parser = argparse.ArgumentParser(description='mCAI pipeline v2.The weight from ribosome genes.', prog='mCAI_ribo', usage='%(prog)s [options]')
+parser = argparse.ArgumentParser(description='mCAI pipeline v2.The weight from ribosome genes.The annotation file is formatted GTF.', prog='mCAI_ribo_gtf', usage='%(prog)s [options]')
 parser.add_argument('--spe', nargs='?', type=str, help='species name')
 parser.add_argument('--spA', nargs='?', type=str, help='species name abbreviation')
 parser.add_argument('--ann', nargs='*', type=str, default='ref.gtf', help='input gtf format file')

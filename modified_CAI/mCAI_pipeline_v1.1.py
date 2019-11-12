@@ -1,18 +1,18 @@
 #!/usr/bin/python
 # coding:utf-8
-# =========================================================================================================
-# Yingying Dong.2019-11-8.mCAI pipeline v1.1.The weight from genes that product ribosomal protein.The genes
-#   name from formatted gff annotation file 
-# =========================================================================================================
+# =============================================================================================================
+# Yingying Dong.2019-11-8.Modified date:2019-11-12.mCAI pipeline v1.1.The weight from genes that product
+#  ribosomal protein.The genes name from formatted gff annotation file.The gene id from gtf.GFF no CDS header.
+# =============================================================================================================
 import os, sys
 import argparse
 import rpy2.robjects as robjects
 from scipy import stats
 
-parser = argparse.ArgumentParser(description='mCAI pipeline v1.1', prog='mCAI_ribo_gff', usage='%(prog)s [options]')
+parser = argparse.ArgumentParser(description='mCAI pipeline v1.1', prog='mCAI_ribo_name', usage='%(prog)s [options]')
 parser.add_argument('--spe', nargs='?', type=str, help='species name')
 parser.add_argument('--spA', nargs='?', type=str, help='species name abbreviation')
-parser.add_argument('--ann', nargs='*', type=str, default='ref.gff', help='input gff format file')
+parser.add_argument('--ann', nargs='*', type=str, default='ref.gtf', help='input gtf format file')
 parser.add_argument('--inp', nargs='*', type=str, default='CDS_DNA.fa',
                     help='expected FASTA file of calculations RSCU and weight')
 args = parser.parse_args()
@@ -20,9 +20,9 @@ args = parser.parse_args()
 ### Get gene ID from the gene name.At the same time,extract their DNA sequence.
 
 os.chdir('/media/hp/disk1/DYY/reference/annotation/{}/'.format(args.spe))
-gff_path = '/media/hp/disk1/DYY/reference/annotation/{}/'.format(args.spe)
+gtf_path = '/media/hp/disk1/DYY/reference/annotation/{}/'.format(args.spe)
 name_file = open('ribo_geneName_u.txt', 'r')
-gff = open('{}{}'.format(gff_path, args.ann), 'r')
+gtf = open('{}{}'.format(gtf_path, args.ann), 'r')
 id_file = open('ribo_geneID.txt', 'w')
 
 DNA_path = '/media/hp/disk1/DYY/reference/annotation/{}/ref/'.format(args.spe)
@@ -31,13 +31,13 @@ ex_seq = open('{}ribo_seq.fa'.format(DNA_path), 'w')
 
 name_table = []
 name_id = {}
-gff_table = []
+gtf_table = []
 id_table = []
 for i in name_file.readlines():
     name_table.append(i.strip())
-for j in gff:
-    gff_table.append(j.strip().split('\t'))
-for k in gff_table:
+for j in gtf:
+    gtf_table.append(j.strip().split('\t'))
+for k in gtf_table:
     # print(k[9])
     name_id[k[9]] = k[8]
 for l in name_id.keys():
@@ -60,7 +60,7 @@ for line in id_table:
         print(line + ' Its sequence may not be coding sequence')
 
 name_file.close()
-gff.close()
+gtf.close()
 id_file.close()
 ex_seq.close()
 ### Calculates codon frequency,RSCU value,weight in the gene FASTA sequence file.

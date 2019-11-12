@@ -23,7 +23,7 @@ os.chdir('/media/hp/disk1/DYY/reference/annotation/{}/'.format(args.spe))
 gff_path = '/media/hp/disk1/DYY/reference/annotation/{}/'.format(args.spe)
 name_file = open('ribo_geneName_u.txt', 'r')
 gff = open('{}{}'.format(gff_path, args.ann), 'r')
-id_file = open('ribo_geneID', 'w')
+id_file = open('ribo_geneID.txt', 'w')
 
 DNA_path = '/media/hp/disk1/DYY/reference/annotation/{}/ref/'.format(args.spe)
 DNA = open('{}CDS_DNA.fa'.format(DNA_path), 'r')

@@ -181,6 +181,6 @@ names(a) = c("all_CAI_cor","top_CAI_cor","high_CAI_cor","low_CAI_cor","def_CAI_c
 write.table(paste(mean(a$all_CAI_cor),mean(a$top_CAI_cor),mean(a$high_CAI_cor),
                   mean(a$low_CAI_cor),mean(a$def_CAI_cor),mean(a$half_CAI_cor),sep = '\t'),file = "mean_cor.txt",
             quote = FALSE,row.names = "mean_mCAI_correlation", 
-            col.names = "all_CAI_cor\ttop_CAI_cor\thigh_CAI_cor\tlow_CAI_cor\tdef_CAI_cor\thalf_CAI_cor")
+            col.names = "\tall_CAI_cor\ttop_CAI_cor\thigh_CAI_cor\tlow_CAI_cor\tdef_CAI_cor\thalf_CAI_cor")
 
 

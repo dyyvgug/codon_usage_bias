@@ -1,3 +1,6 @@
+#===============================================================================================
+# Yingying Dong.2019-11-12.Group mean.
+#===============================================================================================
 library(ggplot2)
 library(dplyr)
 setwd('/home/hp/Desktop')
@@ -19,4 +22,4 @@ df3 <- df3[-1, ]
 df3[] <- lapply(df3, function(x) type.convert(as.character(x))) # converting the columns to their appropriate types
 write.table(df,file = "all_ave_mCAItpm_cor.txt",sep = '\t',row.names = F,quote = F)
 write.table(df2,file = "ave_mCAItpm_cor.txt",sep = '\t',row.names = F,quote = F)
-
+write.table(df3,file = 'ave_mCAItpm_cor_invert.txt',sep = '\t',row.names = F,quote = F)

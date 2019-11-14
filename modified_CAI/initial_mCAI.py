@@ -3,18 +3,20 @@
 # Yingying Dong.2019-10-25.Modified date:2019-10-28.2019-11-14.
 # This program calculates CAI,weights from reference gene set.
 import sys
+import os
 import argparse
 from scipy import stats
 
 parser = argparse.ArgumentParser(description='only calculate mCAI.', prog='cal_mCAI', usage='%(prog)s [options]')
 parser.add_argument('--spe', nargs='?', type=str, help='species name')
 parser.add_argument('--spA', nargs='?', type=str, help='species name abbreviation')
-parser.add_argument('--inp', nargs='*', type=str, default='CDS_DNA.fa',
+parser.add_argument('--inp', nargs='?', type=str, default='CDS_DNA.fa',
                     help='expected FASTA file of calculations RSCU and weight')
 args = parser.parse_args()
 
 os.chdir('/media/hp/disk1/DYY/reference/annotation/{}/'.format(args.spe))
-fa_file = open("ref/{}".format(args.inp), 'r')
+DNA_path = '/media/hp/disk1/DYY/reference/annotation/{}/ref/'.format(args.spe)
+fa_file = open("{}{}".format(DNA_path,args.inp), 'r')
 weight_file = open("ribo_RSCU_weight.txt", 'r')
 CAI_file = open('{}_mCAI.txt'.format(args.spA), 'w')
 

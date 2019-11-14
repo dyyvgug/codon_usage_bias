@@ -1,14 +1,22 @@
 #!/usr/bin/python
 # coding:utf-8
-# Yingying Dong.2019-10-25.Modified date:2019-10-28.
-# This program calculates CAI,weights from reference gene set that high RNAseq TPM and high Ribo-seq TPM.
+# Yingying Dong.2019-10-25.Modified date:2019-10-28.2019-11-14.
+# This program calculates CAI,weights from reference gene set.
 import sys
+import argparse
 from scipy import stats
 
-weight_path = '/home/hp/Desktop/other_riboseq/C_elegans_Ensl_WBcel235/experiment2/aligned/ribo_num/'
-fa_file = open("CDS.fa", 'r')
-weight_file = open("{}hE_hT_RSCU_weight.txt".format(weight_path), 'r')
-CAI_file = open('Ce_mCAI.txt', 'w')
+parser = argparse.ArgumentParser(description='only calculate mCAI.', prog='cal_mCAI', usage='%(prog)s [options]')
+parser.add_argument('--spe', nargs='?', type=str, help='species name')
+parser.add_argument('--spA', nargs='?', type=str, help='species name abbreviation')
+parser.add_argument('--inp', nargs='*', type=str, default='CDS_DNA.fa',
+                    help='expected FASTA file of calculations RSCU and weight')
+args = parser.parse_args()
+
+os.chdir('/media/hp/disk1/DYY/reference/annotation/{}/'.format(args.spe))
+fa_file = open("ref/{}".format(args.inp), 'r')
+weight_file = open("ribo_RSCU_weight.txt", 'r')
+CAI_file = open('{}_mCAI.txt'.format(args.spA), 'w')
 
 weight_table = []
 for line in weight_file:

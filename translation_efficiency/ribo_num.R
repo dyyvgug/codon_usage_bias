@@ -54,13 +54,14 @@ write.table(paste(hiTE$Gene.Name,hiTE$ribo_num,sep = "\t"),
 # Observe the correlation between RNAseq and RIBOseq
 #==================================================================================================================
 co_RNA_ri = cor(only_protein_num$TPM,only_protein_num$ribo_TPM)
-co_RNA_ri
-svg(paste0(name,"cor_RNA_ri.svg"))
+p_RNA_ri = cor.test(only_protein_num$TPM,only_protein_num$ribo_TPM)
+p_RNA_ri
 #plot(only_protein_num$TPM,only_protein_num$ribo_TPM,log = "xy",main = paste0(name,"cor_RNA_ri  ",co_RNA_ri),
 #     xlab="RNA_TPM",ylab="ri_TPM",pch=19,col=rgb(0,0,100,50,maxColorValue=205))
-ggplot(only_protein_num,aes(x = TPM ,y = ribo_TPM))+
+#compare_means(TPM~ribo_TPM, data=only_protein_num)
+p <- ggplot(only_protein_num,aes(x = TPM ,y = ribo_TPM))+
   geom_point(shape = 16,size = 0.75)+
-  labs(title = paste0(name,"cor_RNA_ri    ","r=",co_RNA_ri))+
+  labs(title = paste0(name,'  ',"r=",round(co_RNA_ri,3),"  p-value < 2.220e-16"))+
   #scale_x_continuous(trans='log10')+
   #scale_y_continuous(trans='log10')+
   scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
@@ -69,8 +70,10 @@ ggplot(only_protein_num,aes(x = TPM ,y = ribo_TPM))+
                 labels = trans_format("log10", math_format(10^.x))) +
   annotation_logticks(sides="bl")+
   stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "red",size = 0.75)+
-  theme_bw()
-dev.off()
+  xlab('RNA-seq TPM')+
+  ylab('Ribo-seq TPM')+
+  theme_classic()
+ggsave(paste0(name,"cor_RNA_ri.pdf"), p, width = 4.75, height = 3.15) 
 write.table(co_RNA_ri,file = "cor_RNA_ri.txt",sep = '\t',append = T,quote = FALSE,
             row.names = F, col.names = F)
 #==================================================================================================================

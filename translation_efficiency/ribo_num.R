@@ -71,8 +71,8 @@ p <- ggplot(only_protein_num,aes(x = TPM ,y = ribo_TPM))+
                 labels = trans_format("log10", math_format(10^.x))) +
   annotation_logticks(sides="bl")+
   stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "red",size = 0.75)+
-  xlab('RNA-seq TPM')+
-  ylab('Ribo-seq TPM')+
+  xlab('RNA-seq (TPM)')+
+  ylab('Ribo-seq (TPM)')+
   theme_classic()
 ggsave(paste0(name,"cor_RNA_ri.pdf"), p, width = 4.75, height = 3.15) 
 write.table(co_RNA_ri,file = "cor_RNA_ri.txt",sep = '\t',append = T,quote = FALSE,

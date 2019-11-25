@@ -3,7 +3,7 @@ for i in $(ls *.txt)
 do
 	echo "$i"	
 	sed -i 's/Homo.*-//g' $i
-	sed -i 's/Val.*\t/VAl\t/g' $i
+	sed -i 's/Val.*\t/Val\t/g' $i
 	sed -i 's/Asp.*\t/Asp\t/g' $i
 	sed -i 's/Met.*\t/Met\t/g' $i
 	sed -i 's/Gly.*\t/Gly\t/g' $i
@@ -30,4 +30,5 @@ do
 	sed -i '/Ecoli/d' $i
 	sed -i '/Yeast/d' $i
 	sed -i '1d' $i
+
 done

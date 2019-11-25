@@ -29,5 +29,5 @@ do
 	sed -i '/-/d' $i
 	sed -i '/Ecoli/d' $i
 	sed -i '/Yeast/d' $i
-
+	sed -i '1d' $i
 done

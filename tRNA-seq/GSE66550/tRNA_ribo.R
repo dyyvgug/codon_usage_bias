@@ -1,5 +1,6 @@
 #=================================================================================================
-# 2019-11-25.Author:Yingying Dong.
+# 2019-11-25.Author:Yingying Dong.Correlation analysis of count that anticodon to amino acid from 
+#  tRNA-seq and count that amino acid from ribosomal protein genes. 
 #=================================================================================================
 library(ggplot2)
 spA = 'Hs'

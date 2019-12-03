@@ -1,5 +1,5 @@
 #============================================================================================== 
-# 2019-7-29.Modified date:2019-11-18.Author:Dong Yingying.Roughly  observe the translation efficiency.
+# 2019-7-29.Modified date:2019-9-18.Author:Dong Yingying.Roughly  observe the translation efficiency.
 # Translation efficiency is subtracted from the TPM value quantified by a sample of 
 # RNAseq transcripts and the corresponding TPM value of the RIBO-seq transcript(different lab).
 # And take out genes that express high expression and high translation level.
@@ -7,26 +7,27 @@
 library(ggplot2)
 library(MASS)
 library(scales)
-species = "C_elegans_Ensl_WBcel235"
-KEGG_spe = "Caenorhabditis elegans"
-RNAseq_path = "/RNAseq1/experiment2/SRR1056314_abund.out"
-RNA = read.table(paste0("/home/hp/Desktop/other_riboseq/",species,RNAseq_path),sep = "\t",header = T,quote = "")
+species = "Arabidopsis_thaliana"
+KEGG_spe = "Arabidopsis thaliana"
+RNAseq_path = "/RNAseq1/experiment1/SRR7508939_abund.out"
+RNA = read.table(paste0("/home/hp/Desktop/other_riboseq/",species,RNAseq_path),sep = "\t",header = T,quote = '')
 RNA = RNA[,-c(3,4,5,6,7)]
-setwd(paste0("~/Desktop/other_riboseq/",species,"/experiment2/aligned"))
+setwd(paste0("~/Desktop/other_riboseq/",species,"/experiment2/aligned_ri"))
 dir.create("ribo_num")
 ribo_array = list.files(getwd(),pattern = ".out$")
 ribo_array
 for (i in ribo_array){
   if(FALSE) # examination
     { 
-    ribo = read.table("SRR1804340_abund.out",sep = "\t",header = T,quote = "")
-    name = "SRR1804340_abund.out"
+    ribo = read.table("SRR6801069_abund.out",sep = "\t",header = T,quote = "")
+    name = "SRR6801069_abund.out"
     name = sub("^([^.]*).*", "\\1",name)
     name = gsub("_abund","",name)
   }
   ribo = read.table(i,sep = "\t",header = T,quote = "")
   name = sub("^([^.]*).*", "\\1",i)
   name = sub("_abund","",name)
+  
   ribo = ribo[,-c(2,3,4,5,6,7)]
   names(ribo) = c("Gene.ID","ribo_FPKM","ribo_TPM")
   RNA_ribo = merge(RNA,ribo,by = "Gene.ID",all = T)
@@ -36,7 +37,7 @@ for (i in ribo_array){
   ribo_num = round(RNA_ribo$ribo_TPM / RNA_ribo$TPM,3)
   RNA_ribo_num = cbind(RNA_ribo,ribo_num)
   RNA_ribo_num = RNA_ribo_num[order(RNA_ribo_num$ribo_num,decreasing = T),]
-  #RNA_ribo_num$Gene.ID = gsub("_.*", "", RNA_ribo_num[,1])
+  RNA_ribo_num$Gene.ID = gsub("_.*", "", RNA_ribo_num[,1])
   write.table(RNA_ribo_num,file = paste0("./ribo_num/",name,"_riboNum.txt"),
               sep = "\t",quote = F,row.names = F)
   #=================================================================================================================
@@ -61,6 +62,7 @@ for (i in ribo_array){
   # Observe the correlation between RNAseq and RIBOseq
   #==================================================================================================================
   co_RNA_ri = cor(only_protein_num$TPM,only_protein_num$ribo_TPM)
+  co_RNA_ri
   p_RNA_ri = cor.test(only_protein_num$TPM,only_protein_num$ribo_TPM)
   p_RNA_ri
   #plot(only_protein_num$TPM,only_protein_num$ribo_TPM,log = "xy",main = paste0(name,"cor_RNA_ri  ",co_RNA_ri),
@@ -72,14 +74,23 @@ for (i in ribo_array){
     #scale_x_continuous(trans='log10')+
     #scale_y_continuous(trans='log10')+
     scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
-                labels = trans_format("log10", math_format(10^.x))) +
+                  labels = trans_format("log10", math_format(10^.x))) +
     scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
-                labels = trans_format("log10", math_format(10^.x))) +
+                  labels = trans_format("log10", math_format(10^.x))) +
     annotation_logticks(sides="bl")+
     stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "red",size = 0.75)+
     xlab('RNA-seq (TPM)')+
     ylab('Ribo-seq (TPM)')+
     theme_classic()
+  p
+  if(FALSE){
+    model.lm <- lm(TPM ~ ribo_TPM, data = only_protein_num)
+    summary(model.lm)
+    
+    l <- list(r2 = format(summary(model.lm)$r.squared, digits = 4),
+              p = format(summary(model.lm)$coefficients[2,4], digits = 4))
+    l
+  }
   ggsave(paste0(name,"cor_RNA_ri.pdf"), p, width = 4.75, height = 3.15) 
   write.table(co_RNA_ri,file = "cor_RNA_ri.txt",sep = '\t',append = T,quote = FALSE,
               row.names = F, col.names = F)
@@ -90,32 +101,31 @@ for (i in ribo_array){
   #gene_id = only_protein_num$Gene.Name
   names(df) = c("Gene_ID","Gene_name","TPM","ribo_TPM")
   write.table(df,file = paste0(name,"_protein_TPM.txt"),sep = '\t',quote = F,col.names = T,row.names = F)
-  threshhold <- 1
-  df = subset(df, df[,3] > threshhold) 
-  df = subset(df, df[,4] > threshhold)
+  threshhold1 <- 0.5
+  threshhold2 <- 0.3
+  df = subset(df, df[,3] > threshhold1) 
+  df = subset(df, df[,4] > threshhold2)
   #tmp <- cor(df$TPM,df$ribo_TPM)
   #tmp[upper.tri(tmp)] <- 0
   #data.new <- df[,!apply(tmp,2,function(x) any(x < 0.6))] #something wrong
   qRNA = quantile(df$TPM,probs = seq(0,1,0.01))
   qRNA
-  hiRNA = df[df$TPM > qRNA[97],]    #TOP 4%
-  loRNA = df[df$TPM < qRNA[7],]     #BOTTOM 6%
+  hiRNA = df[df$TPM > qRNA[95],]    #TOP 6%
+  loRNA = df[df$TPM < qRNA[15],]     #BOTTOM 14%
   qRIBO = quantile(df$ribo_TPM,probs = seq(0,1,0.01))
   qRIBO
-  hiRIBO = df[df$ribo_TPM > qRIBO[97],]    #TOP 4%
-  other_ribo = df[df$ribo_TPM < qRIBO[97],]    #In order to compare the differences between other ribosomal genes and high expression of high translation ribosomal genes. 
-  loRIBO = df[df$ribo_TPM < qRIBO[7],]     #BOTTOM 6%
+  hiRIBO = df[df$ribo_TPM > qRIBO[95],]    #TOP 6%
+  other_ribo = df[df$ribo_TPM < qRIBO[95],]    #In order to compare the differences between other ribosomal genes and high expression of high translation ribosomal genes. 
+  loRIBO = df[df$ribo_TPM < qRIBO[15],]     #BOTTOM 14%
   hE_hT <- merge(hiRNA,hiRIBO,all = F)  #TOP4% mRNA level and top4% RIBOseq level,intersection.
   lE_lT <- merge(loRNA,loRIBO,all = F)
-  ehE_hT <- subset(x = df,subset = TPM>10^3 & ribo_TPM>10^3,select = c(Gene_name,TPM,ribo_TPM))
+  ehE_hT <- subset(x = df,subset = TPM>10^3 & ribo_TPM>10,select = c(Gene_name,TPM,ribo_TPM))
   #hE_hT <- subset(x = df,subset = TPM>10^3 & ribo_TPM>55,select = c(Gene_name,TPM,ribo_TPM))
   #lE_lT <- subset(x =df,subset = TPM<.3 & ribo_TPM<.3,select = c(Gene_name,TPM,ribo_TPM))
   #write.table(hE_hT_def,file = paste0("./ribo_num/",name,"_hE_ht_def_gene.txt"),sep = "\t",quote = FALSE,
   #            row.names = F)
   #write.table(lE_lT_def,paste0("./ribo_num/",name,"_lE_lT_def_gene.txt"),sep = "\t",quote = FALSE,
   #            row.names = F)
-  write.table(hE_hT$Gene_name,file = paste0("./ribo_num/",name,"_hE_hT_only_name.txt"),sep = "\n",quote = FALSE,
-              row.names = F,col.names = F)
   write.table(other_ribo,file = paste0("./ribo_num/",name,"_other_ribo_gene.txt"),sep = "\t",quote = FALSE,
               row.names = F)
   write.table(ehE_hT,file = paste0("./ribo_num/",name,"_ehiE_ht_gene.txt"),sep = "\t",quote = FALSE,
@@ -140,7 +150,7 @@ for (i in ribo_array){
   hub$species[which(hub$species== KEGG_spe)]
   query(hub,KEGG_spe)
   hub[hub$species ==  KEGG_spe &hub$rdataclass == 'OrgDb']
-  OrgDb = hub[["AH70577"]]
+  OrgDb = hub[["AH70564"]]
   keytypes(OrgDb)
   #columns(OrgDb)
   #==============================================================================================
@@ -572,17 +582,17 @@ for (i in ribo_array){
     hiTE_entrez_id$ENTREZID,
     fromType = "ncbi-geneid",
     toType = 'kegg',
-    organism='cel')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+    organism='ath')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
   head(hiTE_KEGG_id)
   write.table(hiTE_KEGG_id,file = paste0(name,"_hiTE_KEGGid.txt"),sep = '\t',quote = FALSE,
               row.names = FALSE)
   hiTE_ke = enrichKEGG(
     gene = hiTE_KEGG_id$kegg,
     keyType = "kegg", 
-    organism = 'cel',         
+    organism = 'ath',         
     pAdjustMethod = "BH", 
-    pvalueCutoff = 0.05, 
-    qvalueCutoff = 0.2 )
+    pvalueCutoff = 1, 
+    qvalueCutoff = 1 )
   head(hiTE_ke)
   write.table(hiTE_ke,paste0(name,"_hiTE_KEGG_enrich.txt"),row.names =FALSE)
   svg(filename = paste0(name,"_hiTE_KEGGdot.svg"))
@@ -600,14 +610,14 @@ for (i in ribo_array){
     ehE_hT_entID$ENTREZID,
     fromType = "ncbi-geneid",
     toType = 'kegg',
-    organism='cel')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+    organism='ath')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
   head(ehE_hT_KEGG_id)
   write.table(ehE_hT_KEGG_id,file = paste0(name,"_ehE_hT_KEGGid.txt"),sep = '\t',quote = FALSE,
               row.names = FALSE)
   ehE_hT_ke = enrichKEGG(
     gene = ehE_hT_KEGG_id$kegg,
     keyType = "kegg", 
-    organism = 'cel',         
+    organism = 'ath',         
     pAdjustMethod = "BH", 
     pvalueCutoff = 1, 
     qvalueCutoff = 1 )
@@ -627,14 +637,14 @@ for (i in ribo_array){
     hE_hT_entID$ENTREZID,
     fromType = "ncbi-geneid",
     toType = 'kegg',
-    organism='cel')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+    organism='ath')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
   head(hE_hT_KEGG_id)
   write.table(hE_hT_KEGG_id,file = paste0(name,"_hE_hT_KEGGid.txt"),sep = '\t',quote = FALSE,
               row.names = FALSE)
   hE_hT_ke = enrichKEGG(
     gene = hE_hT_KEGG_id$kegg,
     keyType = "kegg", 
-    organism = 'cel',         
+    organism = 'ath',         
     pAdjustMethod = "BH", 
     pvalueCutoff = 1, 
     qvalueCutoff = 1 )
@@ -654,14 +664,14 @@ for (i in ribo_array){
     lE_lT_entID$ENTREZID,
     fromType = "ncbi-geneid",
     toType = 'kegg',
-    organism='cel')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+    organism='ath')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
   head(lE_lT_KEGG_id)
   write.table(lE_lT_KEGG_id,file = paste0(name,"_lE_lT_KEGGid.txt"),sep = '\t',quote = FALSE,
               row.names = FALSE)
   lE_lT_ke = enrichKEGG(
     gene = lE_lT_KEGG_id$kegg,
     keyType = "kegg", 
-    organism = 'cel',         
+    organism = 'ath',         
     pAdjustMethod = "BH", 
     pvalueCutoff = 1, 
     qvalueCutoff = 1 )

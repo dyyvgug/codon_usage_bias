@@ -5,7 +5,7 @@
 #  improved CAI algorithm.
 #============================================================================================
 library(pheatmap)
-setwd("G:\\ѧϰר��\\species_tree")
+setwd("G:\\Ñ§Ï°×¨ÓÃ\\species_tree")
 tree_TPM = read.csv("species_TPM_only_best.csv",quote = "",header = T)
 TPM_diff <- data.frame(tree_TPM$all_Nc_cor,tree_TPM$jcatCAI_TPM)
 names(TPM_diff) = c("Nc_TPM_cor","CAI(JCat)_TPM_cor")

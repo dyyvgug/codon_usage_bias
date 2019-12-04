@@ -1,6 +1,6 @@
 #========================================================================================================
-# 2019-11-11.Modified date:2019-12-4.Author:Yingying Dong.Correlation analysis of modified CAI and various 
-#  gene expression levels in all samples.The weight from ribosomal protein genes.
+# 2019-11-11.Modified date:2019-12-4.Author:Yingying Dong.Correlation analysis of modified CAI and 
+#  global gene expression in all samples.The weight from hE_hTsome genes.
 #========================================================================================================
 library(getopt)
 library(ggplot2)
@@ -78,7 +78,8 @@ for (i in gtf_array) {
     stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "red",size = 0.75)+
     theme_bw()+
     xlab("mCAI value")+
-    ylab("RNAseq TPM")
+    ylab("RNAseq TPM")+
+    theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())
   print(p)
   
   dev.off()
@@ -97,7 +98,8 @@ for (i in gtf_array) {
     stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "red",size = 0.75)+
     theme_bw()+
     xlab("mCAI value")+
-    ylab("RNAseq TPM")
+    ylab("RNAseq TPM")+
+    theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())
   print(p2)
   dev.off()
   #===========================================================================
@@ -115,7 +117,8 @@ for (i in gtf_array) {
     stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "red",size = 0.75)+
     theme_bw()+
     xlab("mCAI value")+
-    ylab("RNAseq TPM")
+    ylab("RNAseq TPM")+
+    theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())
   print(p3)
   dev.off()
   #==========================================================================
@@ -133,7 +136,8 @@ for (i in gtf_array) {
     stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "red",size = 0.75)+
     theme_bw()+
     xlab("mCAI value")+
-    ylab("RNAseq TPM")
+    ylab("RNAseq TPM")+
+    theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())
   print(p4)
   dev.off()
   #===========================================================================
@@ -152,7 +156,8 @@ for (i in gtf_array) {
     stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "red",size = 0.75)+
     theme_bw()+
     xlab("mCAI value")+
-    ylab("RNAseq TPM")
+    ylab("RNAseq TPM")+
+    theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())
   p5
   print(p5)
   dev.off()
@@ -171,7 +176,8 @@ for (i in gtf_array) {
     stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "red",size = 0.75)+
     theme_bw()+
     xlab("mCAI value")+
-    ylab("RNAseq TPM")
+    ylab("RNAseq TPM")+
+    theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())
   print(p6)
   dev.off()
   #===============================================================================
@@ -189,18 +195,19 @@ for (i in gtf_array) {
     stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "red",size = 0.75)+
     theme_bw()+
     xlab("mCAI value")+
-    ylab("RNAseq TPM")
+    ylab("RNAseq TPM")+
+    theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())
   print(p7)
   dev.off()
   #===============================================================================
   # Write out data,convenient to calculate the average
   #===============================================================================
-  write.table(paste(CAI_cor,top_cai_cor,high_cai_cor,low_cai_cor,def_cai_cor,half_cai_cor,sep = '\t'),file = paste0
+  write.table(paste(CAI_cor,top_cai_cor,high_cai_cor,low_cai_cor,def_cai_cor,half_cai_cor,test_cai_cor,sep = '\t'),file = paste0
               ("/media/hp/disk1/DYY/reference/annotation/", 
                 species,"/correlation_bymCAI_ribo",exp,"/",name,"correlation_mCAI"),
               quote = FALSE,row.names = "correlation", 
-              col.names = "all_CAI_cor\ttop_CAI_cor\thigh_CAI_cor\tlow_CAI_cor\tdef_CAI_cor\thalf_CAI_cor")
-  write.table(paste(CAI_cor,top_cai_cor,high_cai_cor,low_cai_cor,def_cai_cor,half_cai_cor,sep = '\t'),file = paste0
+              col.names = "all_CAI_cor\ttop_CAI_cor\thigh_CAI_cor\tlow_CAI_cor\tdef_CAI_cor\thalf_CAI_cor\ttest_cor")
+  write.table(paste(CAI_cor,top_cai_cor,high_cai_cor,low_cai_cor,def_cai_cor,half_cai_cor,test_cai_cor,sep = '\t'),file = paste0
               ("/media/hp/disk1/DYY/reference/annotation/", 
                 species,"/correlation_bymCAI_ribo",exp,"/","allcor.txt"),append = T,quote = FALSE,
               row.names = F, col.names = F)
@@ -208,8 +215,8 @@ for (i in gtf_array) {
 
 setwd(paste0("/media/hp/disk1/DYY/reference/annotation/",species,"/correlation_bymCAI_ribo",exp,"/" ))
 a = read.table("allcor.txt",sep = '\t',header = F)
-names(a) = c("all_CAI_cor","top_CAI_cor","high_CAI_cor","low_CAI_cor","def_CAI_cor","half_CAI_cor")
+names(a) = c("all_CAI_cor","top_CAI_cor","high_CAI_cor","low_CAI_cor","def_CAI_cor","half_CAI_cor","test_cor")
 write.table(paste(mean(a$all_CAI_cor),mean(a$top_CAI_cor),mean(a$high_CAI_cor),
-                  mean(a$low_CAI_cor),mean(a$def_CAI_cor),mean(a$half_CAI_cor),sep = '\t'),file = "mean_cor.txt",
+                  mean(a$low_CAI_cor),mean(a$def_CAI_cor),mean(a$half_CAI_cor),mean(a$test_cor),sep = '\t'),file = "mean_cor.txt",
             quote = FALSE,row.names = "mean_mCAI_correlation", 
-            col.names = "\tall_CAI_cor\ttop_CAI_cor\thigh_CAI_cor\tlow_CAI_cor\tdef_CAI_cor\thalf_CAI_cor")
+            col.names = "\tall_CAI_cor\ttop_CAI_cor\thigh_CAI_cor\tlow_CAI_cor\tdef_CAI_cor\thalf_CAI_cor\ttest_cor")

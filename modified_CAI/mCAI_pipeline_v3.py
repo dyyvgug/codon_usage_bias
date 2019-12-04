@@ -13,7 +13,7 @@ from scipy import stats
 parser = argparse.ArgumentParser(description='mCAI pipeline v3.The annotation file is formatted GFF3.', prog='mCAI_ribo_gff', usage='%(prog)s [options]')
 parser.add_argument('--spe', nargs='?', type=str, help='species name')
 parser.add_argument('--spA', nargs='?', type=str, help='species name abbreviation')
-parser.add_argument('--ann', nargs='*', type=str, default='ref.gff', help='input gtf format file')
+parser.add_argument('--ann', nargs='*', type=str, default='ref.gff', help='input gff3 format file')
 parser.add_argument('--inp', nargs='*', type=str, default='CDS_DNA.fa',
                     help='expected FASTA file of calculations RSCU and weight')
 args = parser.parse_args()

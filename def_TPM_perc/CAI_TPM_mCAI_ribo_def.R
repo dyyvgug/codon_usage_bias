@@ -1,6 +1,6 @@
 #========================================================================================================
-# 2019-11-11.Modified date:2019-12-4.Author:Yingying Dong.Correlation analysis of modified CAI and 
-#  global gene expression in all samples.The weight from hE_hTsome genes.
+# 2019-11-11.Modified date:2019-12-4.Author:Yingying Dong.Correlation analysis of modified CAI and various 
+#  gene expression levels in all samples.The weight from ribosomal protein genes.
 #========================================================================================================
 library(getopt)
 library(ggplot2)

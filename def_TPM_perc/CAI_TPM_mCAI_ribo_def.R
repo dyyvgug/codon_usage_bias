@@ -55,7 +55,7 @@ for (i in gtf_array) {
   q
   df2 = df[df$TPM >= q[100],] # top 1%
   df3 = df[df$`TPM` >= q[90],] # top 10%
-  df_l = df[df$TPM <= q[48],] # low 48%
+  df_l = df[df$TPM <= q[50],] # low 50%
   df4 = df[df$TPM >= q[100],] # top 1%
   df5 = df[df$TPM >= q[48],] # top 10%
   df_def = subset(df5, !df5$TPM %in%c(df4$TPM)) # Remove the a data frame from the b data frame.
@@ -124,12 +124,12 @@ for (i in gtf_array) {
   #==========================================================================
   # For 0-48%Gene correlation mCAI and TPM 
   #===========================================================================
-  svg(file=paste0("/media/hp/disk1/DYY/reference/annotation/", species,"/picture_bymCAI_ribo",exp,"/","l48_",name,"_CAI_TPM.svg"))
+  svg(file=paste0("/media/hp/disk1/DYY/reference/annotation/", species,"/picture_bymCAI_ribo",exp,"/","l50_",name,"_CAI_TPM.svg"))
   low_cai_cor = cor(df_l$mCAI_value,df_l$TPM)
   low_cai_p = cor.test(df_l$mCAI_value,df_l$TPM)
   p4 <- ggplot(df_l,aes(x = mCAI_value ,y = TPM))+
     geom_point(shape = 16,size = 0.75)+
-    labs(title = paste0(name,"cor_l48_mCAI_TPM    ","r=",round(low_cai_cor,3),"  p=",round(low_cai_p$p.value,5)))+
+    labs(title = paste0(name,"cor_l50_mCAI_TPM    ","r=",round(low_cai_cor,3),"  p=",round(low_cai_p$p.value,5)))+
     scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
                   labels = trans_format("log10", math_format(10^.x))) +
     annotation_logticks(sides="bl")+

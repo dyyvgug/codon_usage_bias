@@ -26,6 +26,9 @@ os.system('sed -i \'s/ID.*Parent=//g\' ref.gff')
 os.system('sed -i \'s/;Dbxref.*product=/\t/g\' ref.gff')
 os.system('sed -i \'s/;protein_id.*//g\' ref.gff')
 os.system('sed -i \'/ribosomal/!d\' ref.gff')
+os.system('sed -i \'/apicoplast/d\' ref.gff')
+os.system('sed -i \'/mitochondrial/d\' ref.gff')
+os.system('sed -i \'/ubiquitin/d\' ref.gff')
 
 r_script1 = '''
 gff = read.table('ref.gff',sep = '\t',header = F,quote = '')

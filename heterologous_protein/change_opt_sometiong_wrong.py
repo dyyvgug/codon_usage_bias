@@ -83,33 +83,41 @@ opt_seq_file.close()
 full_opt = open('GFP_Kp_opt_test.fa','r')
 re_rep = open('GFP_Kp_opt_rm_rep.fa','w')
 
+
 def findrep(base):
+    remove = ''
     pos = opt_seq.find(base)
     while pos >= -1:
         if pos < 0:
             print('These sequences no longer have 5 or more consecutive same nucleotides {}'.format(base))
             break
-        elif pos % 3 == 0:
-            if opt_seq[pos:pos+3] in sub_dic.keys():
-                opt_seq.replace(opt_seq[pos:pos+3],sub_dic[opt_seq[pos:pos + 3]])
-                pos = opt_seq.find(base)
-            else:
-                pos = 2
-        elif pos % 3 == 1:
-            if opt_seq[pos-1:pos+2] in sub_dic.keys():
-                opt_seq.replace(opt_seq[pos-1:pos+2],sub_dic[opt_seq[pos-1:pos+2]])
-                pos = opt_seq.find(base)
-            else:
-                pos = 2
-        elif pos % 3 == 2:
-            if opt_seq[pos+1:pos+4] in sub_dic.keys():
-                opt_seq.replace(opt_seq[pos+1:pos+4],sub_dic[opt_seq[pos+1:pos+4]])
-                pos = opt_seq.find(base)
-            else:
-                print('{} is not optimal codon,something wrong'.format(opt_seq[pos+1:pos+4]))
         else:
-            print('Something wrong')
-
+            if pos % 3 == 0:
+                if opt_seq[pos:pos+3] in sub_dic.keys():
+                    remove = opt_seq.replace(opt_seq[pos:pos+3],sub_dic[opt_seq[pos:pos + 3]])
+                    pos = remove.find(base)
+                else:
+                    pos = 2
+            elif pos % 3 == 1:
+                if opt_seq[pos-1:pos+2] in sub_dic.keys():
+                    remove = opt_seq.replace(opt_seq[pos-1:pos+2],sub_dic[opt_seq[pos-1:pos+2]])
+                    pos = remove.find(base)
+                else:
+                    pos = 2
+            elif pos % 3 == 2:
+                if opt_seq[pos+1:pos+4] in sub_dic.keys():
+                    remove = opt_seq.replace(opt_seq[pos+1:pos+4],sub_dic[opt_seq[pos+1:pos+4]])
+                    pos = remove.find(base)
+                else:
+                    print('{} is not optimal codon,something wrong'.format(opt_seq[pos+1:pos+4]))
+            else:
+                print('Something wrong')
+    print(remove)
+    j = 0
+    while j < len(remove):
+        print(r[j:j + 48])
+        re_rep.write(remove[j:j + 48] + '\n')
+        j = j + 48
 opt_seq = ''
 for line in full_opt:
     if line.startswith('>') and opt_seq == '':
@@ -122,12 +130,7 @@ for line in full_opt:
         rep_posC = findrep('CCCCC')
         rep_posG = findrep('GGGGG')
         rep_posT = findrep('GGT')
-        j = 0
-        while j < len(opt_seq):
-            re_rep.write(opt_seq[j:j + 48] + '\n')
-            j = j + 48
-        opt_seq = ''
-        header = line
-
+    opt_seq = ''
+    header = line
 full_opt.close()
 re_rep.close()

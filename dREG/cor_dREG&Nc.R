@@ -22,7 +22,7 @@ plot(df$dRGE_score,df$Nc,log = "x",main = paste0("cor-dRGE_score-Nc  ",round(sco
      xlab="dREG_score",ylab="Nc",pch=19,col=rgb(0,0,100,50,maxColorValue=255))
 dev.off()
 
-pdf("dREG_signal_density_Nc_cor.jpg")
+pdf("dREG_signal_density_Nc_cor.pdf")
 dREGdensity_Nc_cor = cor(df$dREG_signal_density,df$Nc)
 dREGdensity_Nc_cor
 dREGdensity_Nc_p = cor.test(df$dREG_signal_density,df$Nc)
@@ -30,7 +30,7 @@ plot(df$dREG_signal_density,df$Nc,log = "x",main = paste0("dREG_signal_density-N
      xlab="dREG_signal_density",ylab="Nc",pch=19,col=rgb(0,0,100,50,maxColorValue=255))
 dev.off()
 
-pdf("dREG_GEOdensity_Nc_cor.jpg")
+pdf("dREG_GEOdensity_Nc_cor.pdf")
 GROdensity_cor = cor(df$Gro_density,df$Nc)
 GROdensity_cor
 GROdensity_cor_p = cor.test(df$Gro_density,df$Nc)

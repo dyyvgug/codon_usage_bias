@@ -50,6 +50,8 @@ write.table(bed_rscu,"tRNAseq_anti_ref_codon.txt",sep = '\t',quote = F,row.names
 whole = read.table("/media/hp/disk1/DYY/reference/annotation/Saccharomyces_cerevisiae/ref/codon_frequency.txt")
 names(whole) = c("codon","aa","whole_fre")
 bed_whole = merge(b2,whole,by = "codon")
+bed_whole = bed_whole[-grep("M",bed_whole$aa),]
+bed_whole = bed_whole[-grep("W",bed_whole$aa),]
 anti_whole_p = cor.test(log2(bed_whole$anti_fre),bed_whole$whole_fre)
 anti_whole_p
 p2 <- ggplot(bed_whole,aes(x = log2(bed_whole$anti_fre),y = bed_whole$whole_fre,color = bed_whole$aa))+

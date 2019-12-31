@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # coding:utf-8
-# =========================================================================================================
-# Yingying Dong.2019-12-10.Modified date: 2019-12-30.Change DNA sequence to improve expression.v1.0.
-#  Change the sequence codons to optimal.
-# =========================================================================================================
+# ===========================================================================================================
+# Yingying Dong.2019-12-10.Modified date: 2019-12-31.Change DNA sequence to improve expression pipeline v1.0.
+#  Change the sequence codons to optimal,and avoid polyN and restriction sites.
+# ===========================================================================================================
 import os
 import sys
 import decimal
@@ -20,6 +20,9 @@ args = parser.parse_args()
 os.chdir('/media/hp/disk2/heterologous_protein/Kp/SHAN')
 
 if (args.inDNA != 0):
+    DNAfile = str(args.inDNA)
+    DNAfile = DNAfile.lstrip('[\'')
+    DNAfile = DNAfile.rstrip('\']')
     codon_table = {'GCT': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A', 'CGT': 'R', 'CGC': 'R', 'CGA': 'R', \
                    'CGG': 'R', 'ACT': 'T', 'ACC': 'T', 'ACA': 'T', 'ACG': 'T', 'GTT': 'V', 'GTC': 'V', 'GTA': 'V', \
                    'GTG': 'V', 'GGT': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G', 'TCT': 'S', 'TCC': 'S', 'TCA': 'S', \
@@ -74,12 +77,16 @@ if (args.inDNA != 0):
     aa_file.close()
 
 if(args.inPro != 0):
-    with open(args.inPro, 'r+') as f2:
+    Profile = str(args.inPro)
+    Profile = Profile.lstrip('[\'')
+    Profile = Profile.rstrip('\']')
+    print(Profile)
+    with open(Profile, 'r+') as f2:
         f2.seek(0, 2)
         f2.write('>')
     f2.close()
 
-    aa_seq = open(args.inPro,'r')
+    aa_seq = open(Profile,'r')
     AA_file = open('aa.txt','w')
     AA_seq = ''
     for line in aa_seq:
@@ -179,5 +186,69 @@ init_seq.close()
 opt_seq_file.close()
 
 # ===============================================================================================
-# Remove sequence fragments with many repeated bases and replaced with to rare codons.
+# Remove sequence fragments with many repeated bases and restriction site , then replaced
+#  with to rare codons.
 # ===============================================================================================
+full_opt = open('bac_Kp_opt.fa', 'r')
+re_rep = open('bac_rm_rep.fa', 'w')
+
+
+def findrep(base,opt_seq):
+    pos = 0
+    while pos >= -1:
+        pos = opt_seq.find(base)
+        if pos == -1:
+            print('These sequences no longer have this restriction site or consecutive same nucleotides {}'.format(base))
+            break
+        else:
+            if pos % 3 == 0:
+                if opt_seq[pos:pos+3] in sub_dic.keys():
+                    print(opt_seq[pos:pos + 3])
+                    opt_seq = opt_seq.replace(opt_seq[pos:pos + 3], sub_dic[opt_seq[pos:pos+3]])
+                    pos = opt_seq.find(base)
+                    continue
+            elif pos % 3 == 1:
+                if opt_seq[pos-1:pos+2] in sub_dic.keys():
+                    print(opt_seq[pos-1:pos+2])
+                    opt_seq = opt_seq.replace(opt_seq[pos-1:pos+2], sub_dic[opt_seq[pos-1:pos+2]])
+                    pos = opt_seq.find(base)
+                    continue
+            elif pos % 3 == 2:
+                if opt_seq[pos+1:pos+4] in sub_dic.keys():
+                    print(opt_seq[pos+1:pos+4])
+                    opt_seq = opt_seq.replace(opt_seq[pos+1:pos+4], sub_dic[opt_seq[pos+1:pos+4]])
+                    pos = opt_seq.find(base)
+                    continue
+            else:
+                print('Something wrong')
+
+    return opt_seq
+
+
+opt_seq = ''
+for line in full_opt:
+    if line.startswith('>') and opt_seq == '':
+        header = line
+        print(header)
+        re_rep.write(header)
+    elif not line.startswith('>'):
+        opt_seq = opt_seq + line.strip()
+    elif line.startswith('>') and opt_seq != '':
+        rep_posA = findrep('AAAAA',opt_seq)
+        rep_posC = findrep('CCCCC',opt_seq)
+        rep_posG = findrep('GGGGG',opt_seq)
+        rep_posT = findrep('TTTTT',opt_seq)
+        rep_EcoRI = findrep('GAATTC',opt_seq)
+        rep_SalI = findrep('GTCGAC',opt_seq)
+        rep_NdeI = findrep('GATATG',opt_seq)
+        rep_XhoI = findrep('CTCGAG',opt_seq)
+
+        j = 0
+        while j < len(opt_seq):
+            print(opt_seq[j:j + 48])
+            re_rep.write(opt_seq[j:j + 48] + '\n')
+            j = j + 48
+        opt_seq = ''
+        header = line
+full_opt.close()
+re_rep.close()

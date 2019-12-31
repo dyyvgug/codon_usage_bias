@@ -29,7 +29,8 @@ for j in DNA:
     else:
         database[keys].append(j.strip())
 for line in hE_hT_table:
-    hE_hT_seq.write('>' + str(line) + '\n' + str(''.join(database[line])) + '\n')
+    if line in database.keys():
+        hE_hT_seq.write('>' + str(line) + '\n' + str(''.join(database[line])) + '\n')
 
 hE_hT.close()
 DNA.close()

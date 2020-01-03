@@ -17,8 +17,6 @@ parser.add_argument('--out', nargs='*', type=str, default='optimized_seq.fa', he
 
 args = parser.parse_args()
 
-os.chdir('/media/hp/disk2/heterologous_protein/Kp/SHAN')
-
 if (args.inDNA != 0):
     DNAfile = str(args.inDNA)
     DNAfile = DNAfile.lstrip('[\'')
@@ -33,12 +31,12 @@ if (args.inDNA != 0):
                    'TTG': 'L', 'TGT': 'C', 'TGC': 'C', 'TGG': 'W', 'TAT': 'Y', 'TAC': 'Y', 'TAA': 'STOP', 'TAG': 'STOP', \
                    'TGA': 'STOP'}
 
-    with open(args.inDNA, 'r+') as f:
+    with open(DNAfile, 'r+') as f:
         f.seek(0, 2)
         f.write('>')
     f.close()
 
-    dna_file = open(args.inDNA, 'r')
+    dna_file = open(DNAfile, 'r')
     aa_file = open('aa.txt', 'w')
 
     dna = ''

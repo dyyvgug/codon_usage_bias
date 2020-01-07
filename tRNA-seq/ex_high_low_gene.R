@@ -34,9 +34,10 @@ for (i in gtf_array) {
   write.table(lE10$Gene.ID,file = paste0(name,"_low10_exp_only_name.txt"),
               sep = '\n',quote = F,row.names = F,col.names = F)
   lE20 = df[df$TPM <= qRNA[20],]    #Low 20%
-  write.table(lE10$Gene.ID,file = paste0(name,"_low20_exp_only_name.txt"),
+  write.table(lE20$Gene.ID,file = paste0(name,"_low20_exp_only_name.txt"),
               sep = '\n',quote = F,row.names = F,col.names = F)
   lE30 = df[df$TPM <= qRNA[30],]    #Low 10%
-  write.table(lE10$Gene.ID,file = paste0(name,"_low30_exp_only_name.txt"),
+  write.table(lE30$Gene.ID,file = paste0(name,"_low30_exp_only_name.txt"),
               sep = '\n',quote = F,row.names = F,col.names = F)
 }
+

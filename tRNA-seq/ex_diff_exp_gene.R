@@ -8,8 +8,8 @@ gtf_array
 for (i in gtf_array) {
   if(FALSE) # examination
   { 
-    gtf = read.table("SRR5422018_abund.out", sep = "\t", header=T,quote = "",fill = T)
-    name = "SRR5422018"
+    gtf = read.table("SRR7757133_abund.out", sep = "\t", header=T,quote = "",fill = T)
+    name = "SRR7757133"
   }
   #write.table(gtf$gene_id,file = "id_wait.txt",quote = F,row.names = F, col.names = F)
   gtf = read.table(i, sep = "\t", header = T,quote = "")
@@ -30,6 +30,28 @@ for (i in gtf_array) {
   lE = df[df$TPM <= qRNA[50],]    #Low 50%
   write.table(lE$Gene.ID,file = paste0(name,"_low_exp_only_name.txt"),
               sep = '\n',quote = F,row.names = F,col.names = F)
+  #-----------------------divided into four----------------------------------------
+  q2 = quantile(df$TPM,probs = seq(0,1,0.25))
+  q2[5]
+  df1 = df[df$TPM < q2[2],]      # 0%-25%(not included)
+  df2 = df[df$TPM < q2[3],]      # 0%-50%
+  df3 = df[df$TPM < q2[4],]      # 0%-75%
+  df4 = df[df$TPM < q2[5],]      # 0%-100%
+  
+  group1 <- df1 
+  group2 <- subset(df2, !df2$TPM %in%c(df1$TPM))  # 25%-50%
+  group3 <- subset(df3, !df3$TPM %in%c(df2$TPM))  # 50%-75%
+  group4 <- subset(df4, !df4$TPM %in%c(df3$TPM))  # 75%-100%
+  write.table(group1,file = paste0(name,"_0-25_exp_name.txt"),
+              sep = '\n',quote = F,row.names = F,col.names = F)
+  write.table(group2,file = paste0(name,"_25-50_exp_name.txt"),
+              sep = '\n',quote = F,row.names = F,col.names = F)
+  write.table(group3,file = paste0(name,"_50-75_exp_name.txt"),
+              sep = '\n',quote = F,row.names = F,col.names = F)
+  write.table(group4,file = paste0(name,"_75-100_exp_name.txt"),
+              sep = '\n',quote = F,row.names = F,col.names = F)
+  
+  #-------------------low expression level explore in detail----------------------------
   lE10 = df[df$TPM <= qRNA[10],]    #Low 10%
   write.table(lE10$Gene.ID,file = paste0(name,"_low10_exp_only_name.txt"),
               sep = '\n',quote = F,row.names = F,col.names = F)

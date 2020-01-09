@@ -1,21 +1,29 @@
 #!/usr/bin/python
 # coding:utf-8
 # ===========================================================================================================
-# Yingying Dong.2019-12-10.Modified date: 2019-12-31.Change DNA sequence to improve expression pipeline v1.0.
+# Yingying Dong.2019-12-10.Modified date: 2019-1-9.Change DNA sequence to improve expression pipeline v1.0.
 #  Change the sequence codons to optimal,and avoid polyN and restriction sites.
 # ===========================================================================================================
 import os
+import re
 import sys
 import decimal
 import argparse
-parser = argparse.ArgumentParser(description='Change DNA sequence to improve expression.v1.0', prog='change_opt', usage='%(prog)s [options]')
+
+parser = argparse.ArgumentParser(description='Change DNA sequence to improve expression.v1.0', prog='change_opt',
+                                 usage='%(prog)s [options]')
 parser.add_argument('--spe', nargs='?', type=str, help='species name')
 parser.add_argument('--spA', nargs='?', type=str, help='species name abbreviation')
-parser.add_argument('--inDNA', nargs='*', type=str, default=0, help='FASTA file for DNA sequences of genes that wish to increase expression')
-parser.add_argument('--inPro', nargs='*', type=str, default=0, help='FASTA file for protein sequences of genes that wish to increase expression')
-parser.add_argument('--out', nargs='*', type=str, default='optimized_seq.fa', help='file name of output optimized sequence')
+parser.add_argument('--inDNA', nargs='*', type=str, default=0,
+                    help='FASTA file for DNA sequences of genes that wish to increase expression')
+parser.add_argument('--inPro', nargs='*', type=str, default=0,
+                    help='FASTA file for protein sequences of genes that wish to increase expression')
+parser.add_argument('--out', nargs='*', type=str, default='optimized_seq.fa',
+                    help='file name of output optimized sequence')
 
 args = parser.parse_args()
+
+os.chdir('/media/hp/disk2/heterologous_protein/{}'.format(args.spA))
 
 if (args.inDNA != 0):
     DNAfile = str(args.inDNA)
@@ -74,7 +82,7 @@ if (args.inDNA != 0):
     dna_file.close()
     aa_file.close()
 
-if(args.inPro != 0):
+if (args.inPro != 0):
     Profile = str(args.inPro)
     Profile = Profile.lstrip('[\'')
     Profile = Profile.rstrip('\']')
@@ -84,8 +92,8 @@ if(args.inPro != 0):
         f2.write('>')
     f2.close()
 
-    aa_seq = open(Profile,'r')
-    AA_file = open('aa.txt','w')
+    aa_seq = open(Profile, 'r')
+    AA_file = open('aa.txt', 'w')
     AA_seq = ''
     for line in aa_seq:
         if line.startswith('>') and AA_seq == '':
@@ -111,7 +119,7 @@ if(args.inPro != 0):
 init_seq = open('aa.txt', 'r')
 opt_seq_file = open('bac_Kp_opt.fa', 'w')
 RSCU = open('ribo_codon_fre_RSCU.txt', 'r')
-# opt_rare = open('opt_rara_sub_list','w')
+opt_rare = open('opt_rare_sub_list.txt', 'w')
 
 aa_codon_fre = {}
 RSCU_table = []
@@ -134,8 +142,6 @@ raKeyA = list(aa_codon_fre.keys())[list(aa_codon_fre.values()).index({'A': str(r
 sub_dic = {keyA: raKeyA}  # This dictionary stores the optimal codon and rarest codon for an amino acid.
 
 
-# print(opt_dic)
-
 def findopt(aa):
     optimal = max(decimal.Decimal(x[aa]) for x in aa_codon_fre.values() if aa in x)
     optKey = list(aa_codon_fre.keys())[list(aa_codon_fre.values()).index({aa: str(optimal)})]
@@ -152,6 +158,7 @@ for a in list_aa:
 opt_dic['*'] = keye
 # print(opt_dic)
 # print(sub_dic)
+opt_rare.write(str(sub_dic))
 
 prot = ''
 for line in init_seq:
@@ -188,39 +195,35 @@ opt_seq_file.close()
 #  with to rare codons.
 # ===============================================================================================
 full_opt = open('bac_Kp_opt.fa', 'r')
-re_rep = open('bac_rm_rep.fa', 'w')
+re_rep = open(args.out, 'w')
 
-
-def findrep(base,opt_seq):
-    pos = 0
-    while pos >= -1:
-        pos = opt_seq.find(base)
-        if pos == -1:
-            print('These sequences no longer have this restriction site or consecutive same nucleotides {}'.format(base))
-            break
+def findrep(polyN):
+    global opt_seq
+    pN = re.compile(polyN)
+    pos_list = []
+    while len(pN.findall(opt_seq)):
+        for m in pN.finditer(opt_seq):
+            pos = m.start()
+            pos_list.append(pos)
+        print(pos_list)
+        if len(pos_list):
+            for i in pos_list:
+                if i % 3 == 0:
+                    if opt_seq[i:i + 3] in sub_dic.keys():
+                        print(opt_seq[i:i + 3])
+                        opt_seq = opt_seq[:i] + sub_dic[opt_seq[i:i + 3]] + opt_seq[i + 3:]
+                elif i % 3 == 1:
+                    if opt_seq[i - 1:i + 2] in sub_dic.keys():
+                        print(opt_seq[i - 1:i + 2])
+                        opt_seq = opt_seq[:i - 1] + sub_dic[opt_seq[i - 1:i + 2]] + opt_seq[i + 2:]
+                elif i % 3 == 2:
+                    if opt_seq[i + 1:i + 4] in sub_dic.keys():
+                        print(opt_seq[i + 1:i + 4])
+                        opt_seq = opt_seq[:i + 1] + sub_dic[opt_seq[i + 1:i + 4]] + opt_seq[i + 4:]
         else:
-            if pos % 3 == 0:
-                if opt_seq[pos:pos+3] in sub_dic.keys():
-                    print(opt_seq[pos:pos + 3])
-                    opt_seq = opt_seq.replace(opt_seq[pos:pos + 3], sub_dic[opt_seq[pos:pos+3]])
-                    pos = opt_seq.find(base)
-                    continue
-            elif pos % 3 == 1:
-                if opt_seq[pos-1:pos+2] in sub_dic.keys():
-                    print(opt_seq[pos-1:pos+2])
-                    opt_seq = opt_seq.replace(opt_seq[pos-1:pos+2], sub_dic[opt_seq[pos-1:pos+2]])
-                    pos = opt_seq.find(base)
-                    continue
-            elif pos % 3 == 2:
-                if opt_seq[pos+1:pos+4] in sub_dic.keys():
-                    print(opt_seq[pos+1:pos+4])
-                    opt_seq = opt_seq.replace(opt_seq[pos+1:pos+4], sub_dic[opt_seq[pos+1:pos+4]])
-                    pos = opt_seq.find(base)
-                    continue
-            else:
-                print('Something wrong')
-
-    return opt_seq
+            print('These sequences no longer have this restriction site or consecutive same nucleotides')
+    if len(pN.findall(opt_seq)) == 0:
+        print('These sequences no longer have this restriction site or consecutive same nucleotides')
 
 
 opt_seq = ''
@@ -232,15 +235,12 @@ for line in full_opt:
     elif not line.startswith('>'):
         opt_seq = opt_seq + line.strip()
     elif line.startswith('>') and opt_seq != '':
-        rep_posA = findrep('AAAAA',opt_seq)
-        rep_posC = findrep('CCCCC',opt_seq)
-        rep_posG = findrep('GGGGG',opt_seq)
-        rep_posT = findrep('TTTTT',opt_seq)
-        rep_EcoRI = findrep('GAATTC',opt_seq)
-        rep_SalI = findrep('GTCGAC',opt_seq)
-        rep_NdeI = findrep('GATATG',opt_seq)
-        rep_XhoI = findrep('CTCGAG',opt_seq)
-
+        rep_posC = findrep('C{5,}')
+        rep_posG = findrep('G{5,}')
+        rep_posT = findrep('T{5,}')
+        rep_EcoRI = findrep('GAATTC')
+        rep_SalI = findrep('GTCGAC')
+        rep_posA = findrep('A{5,}')
         j = 0
         while j < len(opt_seq):
             print(opt_seq[j:j + 48])
@@ -248,5 +248,6 @@ for line in full_opt:
             j = j + 48
         opt_seq = ''
         header = line
+
 full_opt.close()
 re_rep.close()

@@ -143,7 +143,15 @@ for (i in ribo_array){
               row.names = F,col.names = F)
   write.table(mE_mT$Gene_ID,file = paste0("./ribo_num/",name,"_mE_mT10_only_geneID.txt"),sep = "\t",quote = FALSE,
               row.names = F,col.names = F)
-  
+  rp = df[grep("^rpl|^rps",ignore.case = FALSE,df$Gene_name),]
+  all_rp = df[grep("rpl|rps",ignore.case = FALSE,df$Gene_name),]
+  mrp = all_rp[-grep("^rpl|^rps",ignore.case = FALSE,all_rp$Gene_name),]
+  write.table(rp$Gene_ID,file = paste0("./ribo_num/",name,"_rp_only_geneID.txt"),sep = "\t",quote = FALSE,
+              row.names = F,col.names = F)
+  write.table(mrp$Gene_ID,file = paste0("./ribo_num/",name,"_Mrp_only_geneID.txt"),sep = "\t",quote = FALSE,
+              row.names = F,col.names = F)
+  write.table(all_rp$Gene_ID,file = paste0("./ribo_num/",name,"_all_rp_only_geneID.txt"),sep = "\t",quote = FALSE,
+              row.names = F,col.names = F)
   #======================================================================================================
   # GO and KEGG analyze high translation efficiency genes,high RNA level & high translation level genes,
   # low RNA level & low translation level genes.

@@ -103,8 +103,8 @@ for (i in ribo_array){
   qRNA
   hiRNA = df[df$TPM > qRNA[97],]    # Top 3%
   h2RNA = df[df$TPM > qRNA[90],]    # Top 10%
-  m1RNA = df[df$TPM > qRNA[45],]     # Top 55%
-  m2RNA = df[df$TPM <= qRNA[55],]   # Bottom 55%
+  m1RNA = df[df$TPM < qRNA[45],]     # bottom 45%
+  m2RNA = df[df$TPM < qRNA[55],]   # Bottom 55%
   lRNA = df[df$TPM < qRNA[10],]    # BOTTOM 10%
   mRNA = subset(m2RNA, !m2RNA$TPM %in%c(m1RNA$TPM))  # Middle 10%
   
@@ -113,8 +113,8 @@ for (i in ribo_array){
   hiRIBO = df[df$ribo_TPM > qRIBO[97],]    # TOP 3%
   other_ribo = df[df$ribo_TPM < qRIBO[97],]    #In order to compare the differences between other ribosomal genes and high expression of high translation ribosomal genes. 
   h2RIBO = df[df$ribo_TPM > qRIBO[90],]    # Top 10%
-  m1RIBO = df[df$ribo_TPM > qRIBO[45],]    # Top 55%
-  m2RIBO = df[df$ribo_TPM <= qRIBO[55],]   # Bottom 55%
+  m1RIBO = df[df$ribo_TPM < qRIBO[45],]    # Bottom 45%
+  m2RIBO = df[df$ribo_TPM < qRIBO[55],]   # Bottom 55%
   lRIBO = df[df$ribo_TPM < qRIBO[10],]     # BOTTOM 10%
   mRIBO = subset(m2RIBO,!m2RIBO$ribo_TPM %in%c(m1RIBO$ribo_TPM)) # Middle 10%
   

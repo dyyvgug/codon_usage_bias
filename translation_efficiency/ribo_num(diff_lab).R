@@ -78,9 +78,8 @@ for (i in ribo_array){
     stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "red",size = 0.75)+
     xlab("RNA-seq (TPM)")+
     ylab("Ribo-seq (TPM)")+
-    theme_bw()+
-    theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(),
-          axis.title.x =element_text(size=14), axis.title.y=element_text(size=14))
+    theme_classic()+
+    theme(axis.title.x =element_text(size=14), axis.title.y=element_text(size=14))
   p
   ggsave(paste0(name,"cor_RNA_ri.pdf"))
   

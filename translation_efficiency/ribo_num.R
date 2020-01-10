@@ -1,5 +1,5 @@
 #============================================================================================== 
-# 2019-7-29.Modified date:2019-9-23.Author:Dong Yingying.Roughly  observe the translation efficiency.
+# 2019-7-29.Modified date:2020-1-10.Author:Dong Yingying.Roughly  observe the translation efficiency.
 # Translation efficiency is subtracted from the TPM value quantified by a sample of 
 # RNAseq transcripts and the corresponding TPM value of the RIBO-seq transcript(same lab).
 # And take out genes that express high expression and high translation level.
@@ -7,16 +7,15 @@
 library(ggplot2)
 library(MASS)
 library(scales)
-
-species = "Drosophila_melanogaster"
-KEGG_spe = "Drosophila melanogaster"
+species = "Saccharomyces_cerevisiae"
+KEGG_spe = "Saccharomyces cerevisiae"
 exp = "experiment2"
-RNAnum = "SRR7132281_abund.out"
+RNAnum = "SRR4175342_abund.out"
 setwd(paste0("~/Desktop/other_riboseq/",species,"/",exp,"/aligned/"))
 dir.create("ribo_num")
 RNA = read.table(RNAnum,sep = "\t",header = T,quote = "")
 RNA = RNA[,-c(3,4,5,6,7)]
-RIBOnum = "SRR7132294_abund.out"
+RIBOnum = "SRR4175354_abund.out"
 ribo = read.table(paste0("../aligned_ri/",RIBOnum),sep = "\t",header = T,quote = "")
 name = RIBOnum
 name = sub("^([^.]*).*", "\\1",name)
@@ -55,6 +54,7 @@ write.table(paste(hiTE$Gene.Name,hiTE$ribo_num,sep = "\t"),
 # Observe the correlation between RNAseq and RIBOseq
 #==================================================================================================================
 co_RNA_ri = cor(only_protein_num$TPM,only_protein_num$ribo_TPM)
+co_RNA_ri
 p_RNA_ri = cor.test(only_protein_num$TPM,only_protein_num$ribo_TPM)
 p_RNA_ri
 #plot(only_protein_num$TPM,only_protein_num$ribo_TPM,log = "xy",main = paste0(name,"cor_RNA_ri  ",co_RNA_ri),
@@ -62,7 +62,7 @@ p_RNA_ri
 #compare_means(TPM~ribo_TPM, data=only_protein_num)
 p <- ggplot(only_protein_num,aes(x = TPM ,y = ribo_TPM))+
   geom_point(shape = 16,size = 0.5)+
-  labs(title = paste0(name,'  ',"r=",round(co_RNA_ri,3),"  p-value < 2.220e-16"))+
+  labs(title = paste0(name,'  ',"r=",round(p_RNA_ri$estimate,5),"  p-value < 2.220e-16"))+
   #scale_x_continuous(trans='log10')+
   #scale_y_continuous(trans='log10')+
   scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
@@ -73,8 +73,11 @@ p <- ggplot(only_protein_num,aes(x = TPM ,y = ribo_TPM))+
   stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "red",size = 0.75)+
   xlab('RNA-seq (TPM)')+
   ylab('Ribo-seq (TPM)')+
-  theme_classic()
+  theme_classic()+
+  theme(axis.title.x =element_text(size=14), axis.title.y=element_text(size=14))
+p
 ggsave(paste0(name,"cor_RNA_ri.pdf"), p, width = 4.75, height = 3.15) 
+
 write.table(co_RNA_ri,file = "cor_RNA_ri.txt",sep = '\t',append = T,quote = FALSE,
             row.names = F, col.names = F)
 #==================================================================================================================
@@ -83,43 +86,64 @@ write.table(co_RNA_ri,file = "cor_RNA_ri.txt",sep = '\t',append = T,quote = FALS
 df <- data.frame(only_protein_num$Gene.ID,only_protein_num$Gene.Name,only_protein_num$TPM,only_protein_num$ribo_TPM)
 #gene_id = only_protein_num$Gene.Name
 names(df) = c("Gene_ID","Gene_name","TPM","ribo_TPM")
-write.table(df,file = paste0(name,"_protein_TPM.txt"),sep = '\t',quote = F,col.names = T,row.names = F)
-threshhold <- 0.5
-threshhold2 <- 0.1
+threshhold <- 1
 df = subset(df, df[,3] > threshhold) 
-df = subset(df, df[,4] > threshhold2)
+df = subset(df, df[,4] > threshhold)
 #tmp <- cor(df$TPM,df$ribo_TPM)
 #tmp[upper.tri(tmp)] <- 0
 #data.new <- df[,!apply(tmp,2,function(x) any(x < 0.6))] #something wrong
 qRNA = quantile(df$TPM,probs = seq(0,1,0.01))
 qRNA
-hiRNA = df[df$TPM > qRNA[96],]    #TOP 5%
-loRNA = df[df$TPM < qRNA[11],]     #BOTTOM 10%
+hiRNA = df[df$TPM > qRNA[95],]    # Top 5%
+h2RNA = df[df$TPM > qRNA[90],]    # Top 10%
+m1RNA = df[df$TPM < qRNA[45],]     # bottom 45%
+m2RNA = df[df$TPM < qRNA[55],]   # Bottom 55%
+lRNA = df[df$TPM < qRNA[10],]    # BOTTOM 10%
+mRNA = subset(m2RNA, !m2RNA$TPM %in%c(m1RNA$TPM))  # Middle 10%
+
 qRIBO = quantile(df$ribo_TPM,probs = seq(0,1,0.01))
 qRIBO
-hiRIBO = df[df$ribo_TPM > qRIBO[96],]    #TOP 5%
-other_ribo = df[df$ribo_TPM < qRIBO[96],]    #In order to compare the differences between other ribosomal genes and high expression of high translation ribosomal genes. 
-loRIBO = df[df$ribo_TPM < qRIBO[11],]     #BOTTOM 16%
-hE_hT <- merge(hiRNA,hiRIBO,all = F)  #TOP4% mRNA level and top4% RIBOseq level,intersection.
-lE_lT <- merge(loRNA,loRIBO,all = F)
-ehE_hT <- subset(x = df,subset = TPM>10^2 & ribo_TPM>8,select = c(Gene_name,TPM,ribo_TPM))
+hiRIBO = df[df$ribo_TPM > qRIBO[95],]    # TOP 5%
+other_ribo = df[df$ribo_TPM < qRIBO[95],]    #In order to compare the differences between other ribosomal genes and high expression of high translation ribosomal genes. 
+h2RIBO = df[df$ribo_TPM > qRIBO[90],]    # Top 10%
+m1RIBO = df[df$ribo_TPM < qRIBO[45],]    # Bottom 45%
+m2RIBO = df[df$ribo_TPM < qRIBO[55],]   # Bottom 55%
+lRIBO = df[df$ribo_TPM < qRIBO[10],]     # BOTTOM 10%
+mRIBO = subset(m2RIBO,!m2RIBO$ribo_TPM %in%c(m1RIBO$ribo_TPM)) # Middle 10%
+
+hE_hT <- merge(hiRNA,hiRIBO,all = F)  #TOP5% mRNA level and top3% RIBOseq level,intersection.
+hE_hT10 <- merge(h2RNA,h2RIBO,all = F) 
+lE_lT <- merge(lRNA,lRIBO,all = F)
+mE_mT <- merge(mRNA,mRIBO,all = F)
+#ehE_hT <- subset(x = df,subset = TPM>10^3 & ribo_TPM>10^3,select = c(Gene_name,TPM,ribo_TPM))
 #hE_hT <- subset(x = df,subset = TPM>10^3 & ribo_TPM>55,select = c(Gene_name,TPM,ribo_TPM))
 #lE_lT <- subset(x =df,subset = TPM<.3 & ribo_TPM<.3,select = c(Gene_name,TPM,ribo_TPM))
 #write.table(hE_hT_def,file = paste0("./ribo_num/",name,"_hE_ht_def_gene.txt"),sep = "\t",quote = FALSE,
 #            row.names = F)
 #write.table(lE_lT_def,paste0("./ribo_num/",name,"_lE_lT_def_gene.txt"),sep = "\t",quote = FALSE,
 #            row.names = F)
-write.table(hE_hT$Gene_name,file = paste0("./ribo_num/",name,"_hE_hT_only_name.txt"),sep = "\n",quote = FALSE,
-            row.names = F,col.names = F)                
 write.table(other_ribo,file = paste0("./ribo_num/",name,"_other_ribo_gene.txt"),sep = "\t",quote = FALSE,
             row.names = F)
-write.table(ehE_hT,file = paste0("./ribo_num/",name,"_ehiE_ht_gene.txt"),sep = "\t",quote = FALSE,
-            row.names = F)
-write.table(hE_hT,file = paste0("./ribo_num/",name,"_hiE_ht_gene.txt"),sep = "\t",quote = FALSE,
-            row.names = F)
-write.table(lE_lT,file = paste0("./ribo_num/",name,"_lE_lT_gene.txt"),sep = "\t",quote = FALSE,
+#write.table(ehE_hT,file = paste0("./ribo_num/",name,"_ehiE_ht_gene.txt"),sep = "\t",quote = FALSE,
+#            row.names = F)
+#write.table(hE_hT,file = paste0("./ribo_num/",name,"_hiE_ht_gene.txt"),sep = "\t",quote = FALSE,
+#            row.names = F)
+write.table(lE_lT$Gene_ID,file = paste0("./ribo_num/",name,"_lE_lT_only_geneID.txt"),sep = "\t",quote = FALSE,
             row.names = F )
 write.table(hE_hT$Gene_ID,file = paste0("./ribo_num/",name,"_hE_hT_only_geneID.txt"),sep = "\t",quote = FALSE,
+            row.names = F,col.names = F)
+write.table(hE_hT10$Gene_ID,file = paste0("./ribo_num/",name,"_hE_hT10_only_geneID.txt"),sep = "\t",quote = FALSE,
+            row.names = F,col.names = F)
+write.table(mE_mT$Gene_ID,file = paste0("./ribo_num/",name,"_mE_mT10_only_geneID.txt"),sep = "\t",quote = FALSE,
+            row.names = F,col.names = F)
+rp = df[grep("^rpl|^rps",ignore.case = T,df$Gene_name),]
+all_rp = df[grep("rpl|rps",ignore.case = T,df$Gene_name),]
+mrp = all_rp[-grep("^rpl|^rps",ignore.case = T,all_rp$Gene_name),]
+write.table(rp$Gene_ID,file = paste0("./ribo_num/",name,"_rp_only_geneID.txt"),sep = "\t",quote = FALSE,
+            row.names = F,col.names = F)
+write.table(mrp$Gene_ID,file = paste0("./ribo_num/",name,"_Mrp_only_geneID.txt"),sep = "\t",quote = FALSE,
+            row.names = F,col.names = F)
+write.table(all_rp$Gene_ID,file = paste0("./ribo_num/",name,"_all_rp_only_geneID.txt"),sep = "\t",quote = FALSE,
             row.names = F,col.names = F)
 #======================================================================================================
 # GO and KEGG analyze high translation efficiency genes,high RNA level & high translation level genes,
@@ -135,7 +159,7 @@ unique(hub$species)
 hub$species[which(hub$species== KEGG_spe)]
 query(hub,KEGG_spe)
 hub[hub$species ==  KEGG_spe &hub$rdataclass == 'OrgDb']
-OrgDb = hub[["AH70571"]]
+OrgDb = hub[["AH70579"]]
 keytypes(OrgDb)
 #columns(OrgDb)
 #==============================================================================================
@@ -144,7 +168,7 @@ keytypes(OrgDb)
 ##high translation efficiency genes conversion id 
 hiTE_symbol_id =  hiTE$Gene.Name     
 hiTE_symbol_id = as.character(hiTE_symbol_id)                    
-hiTE_entrez_id = bitr(hiTE_symbol_id, 'SYMBOL','ENTREZID',OrgDb)
+hiTE_entrez_id = bitr(hiTE_symbol_id, 'GENENAME','ENTREZID',OrgDb)
 head(hiTE_entrez_id,2)
 write.table(hiTE_entrez_id,file = paste0(name,"_hiTE_sym_entrez.txt"),sep = '\t',quote = FALSE,
             row.names = FALSE)
@@ -154,7 +178,7 @@ write.table(TE_only_entrezID,file = paste0(name,"_hiTE_ENTREZID.txt"),sep = '\t'
 ##extreme high RNA expression level and high translation level genes
 ehE_hT_symID = ehE_hT$Gene_name
 ehE_hT_symID = as.character(ehE_hT_symID)
-ehE_hT_entID = bitr(ehE_hT_symID,'SYMBOL','ENTREZID',OrgDb)
+ehE_hT_entID = bitr(ehE_hT_symID,'GENENAME','ENTREZID',OrgDb)
 head(ehE_hT_entID,2)
 write.table(ehE_hT_entID,file = paste0(name,"_ehE_hT_sym_entrez.txt"),sep = '\t',quote = F,row.names = F)
 ehET_only_entID = ehE_hT_entID[-1]
@@ -162,7 +186,7 @@ write.table(ehET_only_entID,file = paste0(name,"_ehET_ENTREZID.txt"),sep = '\t',
 ## high RNA expression level and high translation level genes
 hE_hT_symID = hE_hT$Gene_name
 hE_hT_symID = as.character(hE_hT_symID)
-hE_hT_entID = bitr(hE_hT_symID,'SYMBOL','ENTREZID',OrgDb)
+hE_hT_entID = bitr(hE_hT_symID,'GENENAME','ENTREZID',OrgDb)
 head(hE_hT_entID,2)
 write.table(hE_hT_entID,file = paste0(name,"_hE_hT_sym_entrez.txt"),sep = '\t',quote = F,row.names = F)
 hET_only_entID = hE_hT_entID[-1]
@@ -170,7 +194,7 @@ write.table(hET_only_entID,file = paste0(name,"_hET_ENTREZID.txt"),sep = '\t',qu
 ## low RNA expression level and low translation level genes
 lE_lT_symID = lE_lT$Gene_name
 lE_lT_symID = as.character(lE_lT_symID)
-lE_lT_entID = bitr(lE_lT_symID,'SYMBOL','ENTREZID',OrgDb)
+lE_lT_entID = bitr(lE_lT_symID,'GENENAME','ENTREZID',OrgDb)
 head(lE_lT_entID,2)
 write.table(lE_lT_entID,file = paste0(name,"_lE_lT_sym_entrez.txt"),sep = '\t',quote = F,row.names = F)
 hET_only_entID = lE_lT_entID[-1]
@@ -181,26 +205,26 @@ write.table(hET_only_entID,file = paste0(name,"_lET_ENTREZID.txt"),sep = '\t',qu
 #**************all(Biological Process,Cellular Component,Molecular Function)*******************
 if(FALSE) {                             # something wrong,modify it later
   GO_all <- function(x,y)     {
-      go_all = enrichGO(
-        gene = y, 
-        keyType = "ENTREZID",
-        OrgDb = OrgDb,        
-        ont = "ALL",                    # Can also be a kind of CC,BP,MF
-        pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
-        pvalueCutoff = 0.05,            
-        qvalueCutoff = 0.2,
-        readable = TRUE)                # ID to Symbol,easy to read
-      #head(paste0(go_all,2))
-      write.table(go_all,file = paste0(name,"_",x,"_aLL_enrich.txt"),row.names =FALSE)
-      svg(filename = paste0(name,"_",x,"_ALLdot.svg"))
-      dotplot(go_all, x = "Count", title = "EnrichmentGO_all_dot")
-      dev.off()
-      png("test.png")
-      #svg(filename = paste0(name,"_",x,"_ALLbar.svg"))
-      barplot(go_all,showCategory = 10,title = "EnrichmentGO_all_bar")
-      dev.off()
-    }
-GO_all("hiTE",hiTE_entrez_id$ENTREZID)  ## high TE
+    go_all = enrichGO(
+      gene = y, 
+      keyType = "ENTREZID",
+      OrgDb = OrgDb,        
+      ont = "ALL",                    # Can also be a kind of CC,BP,MF
+      pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
+      pvalueCutoff = 0.05,            
+      qvalueCutoff = 0.2,
+      readable = TRUE)                # ID to GENENAME,easy to read
+    #head(paste0(go_all,2))
+    write.table(go_all,file = paste0(name,"_",x,"_aLL_enrich.txt"),row.names =FALSE)
+    svg(filename = paste0(name,"_",x,"_ALLdot.svg"))
+    dotplot(go_all, x = "Count", title = "EnrichmentGO_all_dot")
+    dev.off()
+    png("test.png")
+    #svg(filename = paste0(name,"_",x,"_ALLbar.svg"))
+    barplot(go_all,showCategory = 10,title = "EnrichmentGO_all_bar")
+    dev.off()
+  }
+  GO_all("hiTE",hiTE_entrez_id$ENTREZID)  ## high TE
 }
 ## high TE
 hiTE_go_all = enrichGO(
@@ -209,9 +233,9 @@ hiTE_go_all = enrichGO(
   OrgDb = OrgDb,        
   ont = "ALL",                    # Can also be a kind of CC,BP,MF
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
-  pvalueCutoff = 0.05,            
-  qvalueCutoff = 0.2,
-  readable = TRUE)                # ID to Symbol,easy to read
+  pvalueCutoff = 1,            
+  qvalueCutoff = 1,
+  readable = F)                # ID to GENENAME,easy to read
 head(hiTE_go_all,2)
 write.table(hiTE_go_all,file = paste0(name,"_hiTE_aLL_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_hiTE_ALLdot.svg"))
@@ -229,7 +253,7 @@ ehE_hT_go_all = enrichGO(
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
   pvalueCutoff = 0.05,            
   qvalueCutoff = 0.2,
-  readable = TRUE)                # ID to Symbol,easy to read
+  readable = F)                # ID to GENENAME,easy to read
 head(ehE_hT_go_all,2)
 write.table(ehE_hT_go_all,file = paste0(name,"_ehE_hT_aLL_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_ehE_hT_ALLdot.svg"))
@@ -247,7 +271,7 @@ hE_hT_go_all = enrichGO(
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
   pvalueCutoff = 0.05,            
   qvalueCutoff = 0.2,
-  readable = TRUE)                # ID to Symbol,easy to read
+  readable = F)                # ID to GENENAME,easy to read
 head(hE_hT_go_all,2)
 write.table(hE_hT_go_all,file = paste0(name,"_hE_hT_aLL_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_hE_hT_ALLdot.svg"))
@@ -265,7 +289,7 @@ lE_lT_go_all = enrichGO(
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
   pvalueCutoff = 0.05,            
   qvalueCutoff = 0.2,
-  readable = TRUE)                # ID to Symbol,easy to read
+  readable = F)                # ID to GENENAME,easy to read
 head(lE_lT_go_all,2)
 write.table(lE_lT_go_all,file = paste0(name,"_lE_lT_aLL_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_lE_lT_ALLdot.svg"))
@@ -276,15 +300,15 @@ barplot(lE_lT_go_all,showCategory = 10,title = "EnrichmentGO_all_bar")
 dev.off()
 #*********************************** MF(Molecular Function)*************************************
 ## high TE
- hiTE_go_MF = enrichGO(
+hiTE_go_MF = enrichGO(
   gene = hiTE_entrez_id$ENTREZID, 
   keyType = "ENTREZID",
   OrgDb = OrgDb,        
   ont = "MF",                    # Can also be a kind of CC,BP,MF
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
-  pvalueCutoff = 0.05,            
-  qvalueCutoff = 0.2,
-  readable = TRUE) 
+  pvalueCutoff = 1,            
+  qvalueCutoff = 1,
+  readable = F) 
 head(hiTE_go_MF)
 write.table(hiTE_go_MF,file = paste0(name,"_hiTE_MF_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_hiTE_MFdot.svg"))
@@ -309,7 +333,7 @@ ehE_hT_go_MF = enrichGO(
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
   pvalueCutoff = 0.05,            
   qvalueCutoff = 0.2,
-  readable = TRUE) 
+  readable = F) 
 head(ehE_hT_go_MF)
 write.table(ehE_hT_go_MF,file = paste0(name,"_ehE_hT_MF_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_ehE_hT_MFdot.svg"))
@@ -332,7 +356,7 @@ hE_hT_go_MF = enrichGO(
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
   pvalueCutoff = 0.05,            
   qvalueCutoff = 0.2,
-  readable = TRUE) 
+  readable = F) 
 head(hE_hT_go_MF)
 write.table(hE_hT_go_MF,file = paste0(name,"_hE_hT_MF_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_hE_hT_MFdot.svg"))
@@ -355,7 +379,7 @@ lE_lT_go_MF = enrichGO(
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
   pvalueCutoff = 1,            
   qvalueCutoff = 1,
-  readable = TRUE) 
+  readable = F) 
 head(lE_lT_go_MF)
 write.table(lE_lT_go_MF,file = paste0(name,"_lE_lT_MF_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_lE_lT_MFdot.svg"))
@@ -377,9 +401,9 @@ hiTE_go_BP = enrichGO(
   OrgDb = OrgDb,        
   ont = "BP",                    # Can also be a kind of CC,BP,MF
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
-  pvalueCutoff = 0.05,            
-  qvalueCutoff = 0.2,
-  readable = TRUE) 
+  pvalueCutoff = 1,            
+  qvalueCutoff = 1,
+  readable = F) 
 head(hiTE_go_BP)
 write.table(hiTE_go_BP,file = paste0(name,"_hiTE_BP_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_hiTE_BPdot.svg"))
@@ -404,7 +428,7 @@ ehE_hT_go_BP = enrichGO(
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
   pvalueCutoff = 0.05,            
   qvalueCutoff = 0.2,
-  readable = TRUE) 
+  readable = F) 
 head(ehE_hT_go_BP)
 write.table(ehE_hT_go_BP,file = paste0(name,"_ehE_hT_BP_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_ehE_hT_BPdot.svg"))
@@ -427,7 +451,7 @@ hE_hT_go_BP = enrichGO(
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
   pvalueCutoff = 0.05,            
   qvalueCutoff = 0.2,
-  readable = TRUE) 
+  readable = F) 
 head(hE_hT_go_BP)
 write.table(hE_hT_go_BP,file = paste0(name,"_hE_hT_BP_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_hE_hT_BPdot.svg"))
@@ -450,7 +474,7 @@ lE_lT_go_BP = enrichGO(
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
   pvalueCutoff = 0.05,            
   qvalueCutoff = 0.2,
-  readable = TRUE) 
+  readable = F) 
 head(lE_lT_go_BP)
 write.table(lE_lT_go_BP,file = paste0(name,"_lE_lT_BP_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_lE_lT_BPdot.svg"))
@@ -474,7 +498,7 @@ hiTE_go_CC = enrichGO(
   pAdjustMethod = "BH",           # other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
   pvalueCutoff = 1,            
   qvalueCutoff = 1,
-  readable = TRUE) 
+  readable = F) 
 head(hiTE_go_CC)
 write.table(hiTE_go_CC,paste0(name,"_hiTE_CC_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_hiTE_CCdot.svg"))
@@ -499,7 +523,7 @@ ehE_hT_go_CC = enrichGO(
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
   pvalueCutoff = 0.05,            
   qvalueCutoff = 0.2,
-  readable = TRUE) 
+  readable = F) 
 head(ehE_hT_go_CC)
 write.table(ehE_hT_go_CC,file = paste0(name,"_ehE_hT_CC_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_ehE_hT_CCdot.svg"))
@@ -522,7 +546,7 @@ hE_hT_go_CC = enrichGO(
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
   pvalueCutoff = 0.05,            
   qvalueCutoff = 0.2,
-  readable = TRUE) 
+  readable = F) 
 head(hE_hT_go_CC)
 write.table(hE_hT_go_CC,file = paste0(name,"_hE_hT_CC_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_hE_hT_CCdot.svg"))
@@ -545,7 +569,7 @@ lE_lT_go_CC = enrichGO(
   pAdjustMethod = "BH",           #other correction methods: holm,hochberg,hommel,bonferroni,BH,BY,fdr,none
   pvalueCutoff = 0.05,            
   qvalueCutoff = 0.2,
-  readable = TRUE) 
+  readable = F) 
 head(lE_lT_go_CC)
 write.table(lE_lT_go_CC,file = paste0(name,"_lE_lT_CC_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_lE_lT_CCdot.svg"))
@@ -567,17 +591,17 @@ hiTE_KEGG_id = bitr_kegg(
   hiTE_entrez_id$ENTREZID,
   fromType = "ncbi-geneid",
   toType = 'kegg',
-  organism='dme')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+  organism='sce')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
 head(hiTE_KEGG_id)
 write.table(hiTE_KEGG_id,file = paste0(name,"_hiTE_KEGGid.txt"),sep = '\t',quote = FALSE,
             row.names = FALSE)
 hiTE_ke = enrichKEGG(
   gene = hiTE_KEGG_id$kegg,
   keyType = "kegg", 
-  organism = 'dme',         
+  organism = 'sce',         
   pAdjustMethod = "BH", 
-  pvalueCutoff = 0.05, 
-  qvalueCutoff = 0.2 )
+  pvalueCutoff = 1, 
+  qvalueCutoff = 1 )
 head(hiTE_ke)
 write.table(hiTE_ke,paste0(name,"_hiTE_KEGG_enrich.txt"),row.names =FALSE)
 svg(filename = paste0(name,"_hiTE_KEGGdot.svg"))
@@ -595,14 +619,14 @@ ehE_hT_KEGG_id = bitr_kegg(
   ehE_hT_entID$ENTREZID,
   fromType = "ncbi-geneid",
   toType = 'kegg',
-  organism='dme')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+  organism='sce')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
 head(ehE_hT_KEGG_id)
 write.table(ehE_hT_KEGG_id,file = paste0(name,"_ehE_hT_KEGGid.txt"),sep = '\t',quote = FALSE,
             row.names = FALSE)
 ehE_hT_ke = enrichKEGG(
   gene = ehE_hT_KEGG_id$kegg,
   keyType = "kegg", 
-  organism = 'dme',         
+  organism = 'sce',         
   pAdjustMethod = "BH", 
   pvalueCutoff = 1, 
   qvalueCutoff = 1 )
@@ -622,14 +646,14 @@ hE_hT_KEGG_id = bitr_kegg(
   hE_hT_entID$ENTREZID,
   fromType = "ncbi-geneid",
   toType = 'kegg',
-  organism='dme')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+  organism='sce')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
 head(hE_hT_KEGG_id)
 write.table(hE_hT_KEGG_id,file = paste0(name,"_hE_hT_KEGGid.txt"),sep = '\t',quote = FALSE,
             row.names = FALSE)
 hE_hT_ke = enrichKEGG(
   gene = hE_hT_KEGG_id$kegg,
   keyType = "kegg", 
-  organism = 'dme',         
+  organism = 'sce',         
   pAdjustMethod = "BH", 
   pvalueCutoff = 1, 
   qvalueCutoff = 1 )
@@ -649,14 +673,14 @@ lE_lT_KEGG_id = bitr_kegg(
   lE_lT_entID$ENTREZID,
   fromType = "ncbi-geneid",
   toType = 'kegg',
-  organism='dme')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
+  organism='sce')           #abbreviation https://www.genome.jp/kegg/catalog/org_list.html
 head(lE_lT_KEGG_id)
 write.table(lE_lT_KEGG_id,file = paste0(name,"_lE_lT_KEGGid.txt"),sep = '\t',quote = FALSE,
             row.names = FALSE)
 lE_lT_ke = enrichKEGG(
   gene = lE_lT_KEGG_id$kegg,
   keyType = "kegg", 
-  organism = 'dme',         
+  organism = 'sce',         
   pAdjustMethod = "BH", 
   pvalueCutoff = 1, 
   qvalueCutoff = 1 )
@@ -671,5 +695,3 @@ dev.off()
 #.rs.restartR()                    # if occur error 
 emapplot(lE_lT_ke,showCategory = 30)
 cnetplot(lE_lT_ke,showCategory = 5)
-
-

@@ -62,7 +62,7 @@ p_RNA_ri
 #compare_means(TPM~ribo_TPM, data=only_protein_num)
 p <- ggplot(only_protein_num,aes(x = TPM ,y = ribo_TPM))+
   geom_point(shape = 16,size = 0.5)+
-  labs(title = paste0(name,'  ',"r=",round(p_RNA_ri$estimate,5),"  p-value < 2.220e-16"))+
+  labs(title = paste0(name,'  ',"r=",round(p_RNA_ri$estimate,5),"  p-value < 2.2e-16"))+
   #scale_x_continuous(trans='log10')+
   #scale_y_continuous(trans='log10')+
   scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),

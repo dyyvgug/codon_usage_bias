@@ -5,7 +5,7 @@
 #===========================================================================================================
 library(pheatmap)
 
-species = 'C_elegans_Ensl_WBcel235'
+species = 'Saccharomyces_cerevisiae'
 exp = '2'
 
 setwd(paste0("~/Desktop/other_riboseq/",species,"/experiment",exp,"/aligned/ribo_num"))
@@ -20,22 +20,22 @@ global_gene = read.table(paste0("/media/hp/disk1/DYY/reference/annotation/",spec
                            ,header = T,sep = '\t',quote = "",stringsAsFactors = F)
 
 hE_hT_RSCU = data.frame(hE_hT$AA,hE_hT$codon,hE_hT$RSCU)
-names(hE_hT_RSCU) = c("AA","codon","hE_hT_RSCU")
+names(hE_hT_RSCU) = c("AA","codon","hEhT (RSCU)")
 hE_hT10_RSCU = data.frame(hE_hT10$codon,hE_hT10$RSCU)
-names(hE_hT10_RSCU) = c("codon","hE_hT10_RSCU")
+names(hE_hT10_RSCU) = c("codon","hEhT10 (RSCU)")
 mE_mT10_RSCU = data.frame(mE_mT10$codon,mE_mT10$RSCU)
-names(mE_mT10_RSCU) = c("codon","mE_mT10_RSCU")
+names(mE_mT10_RSCU) = c("codon","mEmT10 (RSCU)")
 lE_lT_RSCU = data.frame(lE_lT$codon,lE_lT$RSCU)
-names(lE_lT_RSCU) = c("codon","lE_lT10_RSCU")
+names(lE_lT_RSCU) = c("codon","lElT10 (RSCU)")
 
 global_RSCU = data.frame(global_gene$codon,global_gene$RSCU)
-names(global_RSCU) = c("codon","genome_RSCU")
+names(global_RSCU) = c("codon","Whole genome (RSCU)")
 all_rp_RSCU = data.frame(all_rp$codon,all_rp$RSCU)
-names(all_rp_RSCU) = c("codon","all_RP_RSCU")
+names(all_rp_RSCU) = c("codon","all RP (RSCU)")
 Mrp_RSCU = data.frame(Mrp$codon,Mrp$RSCU)
-names(Mrp_RSCU) = c("codon","Mitochondria_RP_RSCU")
+names(Mrp_RSCU) = c("codon","Mitochondria RP (RSCU)")
 rp_RSCU = data.frame(rp$codon,rp$RSCU)
-names(rp_RSCU) = c("codon","RP_RSCU")
+names(rp_RSCU) = c("codon","Cytosolic RP (RSCU)")
 
 #-----------------------PART I-------------------------------
 codon_RSCU = merge(hE_hT_RSCU,hE_hT10_RSCU,by = "codon")
@@ -55,7 +55,7 @@ codon_RSCU = codon_RSCU[,-c(1,2,7)]
 
 pheatmap(codon_RSCU,cluster_cols = FALSE,color = colorRampPalette(c("red", "black", "green"))(50),         
          cellwidth = 37, cellheight = 12, fontsize = 7,
-         filename = "heatmap_40_codon_RSCU_perc.pdf")
+         filename = "heatmap_codon_RSCU_perc.pdf")
 
 #----------------------------PART II----------------------------------
 ribo_RSCU = merge(hE_hT_RSCU,rp_RSCU,by = "codon")
@@ -74,5 +74,5 @@ ribo_RSCU = ribo_RSCU[,-c(1,2,7)]
 
 pheatmap(ribo_RSCU,cluster_cols = FALSE,color = colorRampPalette(c("red", "black", "green"))(50),         
          cellwidth = 37, cellheight = 12, fontsize = 7,
-         filename = "heatmap_40_codon_RSCU_RPclass.pdf")
+         filename = "heatmap_codon_RSCU_RPclass.pdf")
 

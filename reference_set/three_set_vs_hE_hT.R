@@ -14,13 +14,13 @@ s_TPM = s_TPM[complete.cases(s_TPM),]
 s_TPM = unique(s_TPM)
 
 pdf('40_three_set_vs_hE_hT_TPMbox.pdf')
-p1 <- boxplot(s_TPM$TPM,hE_hT$TPM,TPM$TPM,log = 'y',boxwex = .5,cex = .5,cex.lab = 1.4,
-             names=c('three_intersection84','hE_hT192','global_gene12444'),col=c("red","yellow","lightblue"),
-             ylab = 'TPM',main = '(n = 84)\t\t(n=192)\t\t(n=12444)')
+p1 <- boxplot(s_TPM$TPM,hE_hT$TPM,TPM$TPM,log = 'y',boxwex = .5,cex = .5,cex.lab = 1.4,pch = 18,
+             names=c('three intersection','hEhT','whole genome'),col=c("red","yellow","lightblue"),
+             ylab = 'RNA-seq (TPM)',main = '(n = 84)\t\t(n=192)\t\t(n=12444)')
 
 p2 <- boxplot(s_TPM$ribo_TPM,hE_hT$ribo_TPM,TPM$TPM,log = 'y',boxwex = .5,cex = .5,cex.lab = 1.4,
-             names=c('three_intersection84','hE_hT192','global_gene12444'),
-             col=c("red","yellow","lightblue"),ylab = 'ribo_TPM',main = '(n = 84)\t\t(n=192)\t\t(n=12444)')
+             names=c('three intersection','hEhT','whole genome'),pch = 18,
+             col=c("red","yellow","lightblue"),ylab = 'Ribo-seq (TPM)',main = '(n = 84)\t\t(n=192)\t\t(n=12444)')
 dev.off()
 #=======================================================================================================
 # Extract GO three classification most significant set,then get their intersection.
@@ -42,13 +42,16 @@ s_e_s_TPM = s_e_s_TPM[complete.cases(s_e_s_TPM),]
 
 pdf('inter_except_inter_TPMbox.pdf')
 p3 <- boxplot(ss_TPM$TPM,h_e_s_TPM$TPM,s_e_s_TPM$TPM,TPM$TPM,log = 'y',
-             names=c('inter_inter','hEhT_exc_inter','inter_exc_inter','global_gene'),
-             col=c("red","yellow",'blue','green'),ylab = 'TPM')
-dev.off()
-pdf('inter_except_inter_riboTPMbox.pdf')
+             names=c('group I','group II','group III','whole genome'),
+             col=c("orange","yellow",'red','lightblue'),ylab = 'RNA-seq (TPM)',
+             boxwex = .5,cex = .5,cex.lab = 1.4,pch = 18,
+             main = '(n = 69) (n = 123) (n = 15) (n = 12444)')
+
 p4 <- boxplot(ss_TPM$ribo_TPM,h_e_s_TPM$ribo_TPM,s_e_s_TPM$ribo_TPM,TPM$ribo_TPM,log = 'y',
-             names=c('inter_inter','hEhT_exc_inter','inter_exc_inter','global_gene'),
-             col=c("red","yellow",'blue','green'),ylab = 'riboTPM')
+             names=c('group I','group II','group III','whole genome'),
+             col=c("orange","yellow",'red','lightblue'),ylab = 'Ribo-seq (TPM)',
+             boxwex = .5,cex = .5,cex.lab = 1.4,pch = 18,
+             main = '(n = 69) (n = 123) (n = 15) (n = 12444)')
 dev.off()
 
 

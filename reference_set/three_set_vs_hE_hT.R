@@ -20,12 +20,12 @@ s_TPM = unique(s_TPM)
 pdf('three_set_vs_hE_hT_TPMbox.pdf')
 p1 <- boxplot(s_TPM$TPM,hE_hT$TPM,TPM$TPM,log = 'y',boxwex = .5,cex = .5,cex.lab = 1.4,pch = 18,
               names=c('three intersection','hEhT','whole genome'),col=c("red","yellow","lightblue"),
-              ylab = 'RNA-seq (TPM)',
+              ylab = 'RNA-seq (log TPM)',
               main = paste0('(n = ',nrow(s_TPM),')(n = ',nrow(hE_hT),')(n = ',nrow(TPM),')'))
 
 p2 <- boxplot(s_TPM$ribo_TPM,hE_hT$ribo_TPM,TPM$TPM,log = 'y',boxwex = .5,cex = .5,cex.lab = 1.4,
               names=c('three intersection','hEhT','whole genome'),pch = 18,
-              col=c("red","yellow","lightblue"),ylab = 'Ribo-seq (TPM)',
+              col=c("red","yellow","lightblue"),ylab = 'Ribo-seq (log TPM)',
               main = paste0('(n = ',nrow(s_TPM),')(n = ',nrow(hE_hT),')(n = ',nrow(TPM),')'))
 dev.off()
 hE_hT_only_name = hE_hT[,-c(1,3,4)]

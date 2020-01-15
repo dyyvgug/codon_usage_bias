@@ -19,12 +19,12 @@ s_TPM = unique(s_TPM)
 
 pdf('all_cc_vs_hE_hT_TPMbox.pdf')
 p1 <- boxplot(s_TPM$TPM,hE_hT$TPM,TPM$TPM,log = 'y',pch = 18,names=c('all CC','hEhT','whole genome'),
-              col=c("red","yellow","lightblue"),ylab = 'RNA-seq (TPM)',boxwex = .5,cex = .5,
+              col=c("red","yellow","lightblue"),ylab = 'RNA-seq (log TPM)',boxwex = .5,cex = .5,
               main = paste0('(n = ',nrow(s_TPM),')(n = ',nrow(hE_hT),')(n = ',nrow(TPM),')'),cex.lab = 1.4)
 
 p2 <- boxplot(s_TPM$ribo_TPM,hE_hT$ribo_TPM,TPM$ribo_TPM,log = 'y',pch = 18,boxwex = .5,cex = .5,
               names=c('all CC','hEhT','whole genome'),cex.lab = 1.4,
-              col=c("red","yellow","lightblue"),ylab = 'Ribo-seq (TPM)',
+              col=c("red","yellow","lightblue"),ylab = 'Ribo-seq (log TPM)',
               main = paste0('(n = ',nrow(s_TPM),')(n = ',nrow(hE_hT),')(n = ',nrow(TPM),')'))
 dev.off()
 hE_hT_only_name = hE_hT[,-c(1,3,4)]
@@ -50,11 +50,11 @@ s_e_s_TPM = s_e_s_TPM[complete.cases(s_e_s_TPM),]
 pdf('CC_except_inter_TPMbox.pdf')
 p3 <- boxplot(ss_TPM$TPM,h_e_s_TPM$TPM,s_e_s_TPM$TPM,TPM$TPM,log = 'y',pch = 18,boxwex = .5,
               names=c('group I','group II','group III','whole genome'),cex.lab = 1.4,
-              col=c("orange","yellow",'red','lightblue'),ylab = 'RNA-seq (TPM)',cex = .5,
+              col=c("orange","yellow",'red','lightblue'),ylab = 'RNA-seq (log TPM)',cex = .5,
               main = paste0('(n = ',nrow(ss_TPM),')(n = ',nrow(h_e_s_TPM),')(n = ',nrow(s_e_s_TPM),')(n = ',nrow(TPM),')'))
 
 p4 <- boxplot(ss_TPM$ribo_TPM,h_e_s_TPM$ribo_TPM,s_e_s_TPM$ribo_TPM,TPM$ribo_TPM,log = 'y',pch = 18,
               names=c('group I','group II','group III','whole genome'),cex.lab = 1.4,
-              col=c("orange","yellow",'red','lightblue'),ylab = 'Ribo-seq (TPM)',boxwex = .5,cex = .5,
+              col=c("orange","yellow",'red','lightblue'),ylab = 'Ribo-seq (log TPM)',boxwex = .5,cex = .5,
               main = paste0('(n = ',nrow(ss_TPM),')(n = ',nrow(h_e_s_TPM),')(n = ',nrow(s_e_s_TPM),')(n = ',nrow(TPM),')'))
 dev.off()

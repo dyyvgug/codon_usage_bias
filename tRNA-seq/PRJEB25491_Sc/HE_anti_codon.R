@@ -1,6 +1,6 @@
 #==========================================================================================
 # Yingying Dong.2020-2-10.Different expression and  translation levels 
-# genes CDS codon & tRNA seq anticodon
+# genes CDS codons & tRNA seq anticodons
 #==========================================================================================
 library(dplyr)
 library(dplyr)

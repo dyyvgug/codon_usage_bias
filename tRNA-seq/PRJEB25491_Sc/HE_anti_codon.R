@@ -1,6 +1,8 @@
 #==========================================================================================
-# Yingying Dong.2019-12-18.tRNA seq anticodon & the reference set codon
+# Yingying Dong.2020-2-10.Different expression and  translation levels 
+# genes CDS codon & tRNA seq anticodon
 #==========================================================================================
+library(dplyr)
 library(dplyr)
 require(Biostrings)
 library(ggplot2)
@@ -9,7 +11,7 @@ spA = "Sc"
 per = 'hE_hT'
 specie = 'Saccharomyces_cerevisiae'
 
-setwd("G:\\Ñ§Ï°×¨ÓÃ\\tRNA\\Sc\\seqbackup\\aligned_tRNA_one")
+setwd("G:\\tRNA\\Sc\\seqbackup\\aligned_tRNA_one")
 bed = read.table("ERR2382482.bed", sep = "\t")
 b1 = as.data.frame(table(bed$V1))
 b1$id = gsub(".+tRNA-", "", b1$Var1)

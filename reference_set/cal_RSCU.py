@@ -7,7 +7,6 @@
 # ====================================================================================================
 import os, sys
 import argparse
-import rpy2.robjects as robjects
 
 parser = argparse.ArgumentParser(description='calculates codon frequency,RSCU value,weight', prog='RSCU_weight',
                                  usage='%(prog)s [options]')

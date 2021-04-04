@@ -7,18 +7,13 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser(description='find DNA sequence',prog='find seq',usage='%(prog)s [options]')
-parser.add_argument('--spe', nargs='?',type=str,help='species name')
 parser.add_argument('--samp', nargs='?',type=str,help='sample name')
-parser.add_argument('--exp', nargs='?',type=str,help='experiment lab number')
-parser.add_argument('--per', nargs='?',type=str,help='expression level')
 args = parser.parse_args()
 
 
-os.chdir('/media/hp/disk1/DYY/reference/annotation/{}/ref'.format(args.spe))
 DNA = open('CDS_DNA.fa','r')
-hE_path = '/home/hp/Desktop/other_riboseq/{}/experiment{}/aligned/ribo_num/'.format(args.spe,args.exp)
-hE = open('{}{}_{}_only_geneID.txt'.format(hE_path,args.samp,args.per),'r')
-hE_seq = open('{}{}_{}_seq.fa'.format(hE_path,args.samp,args.per),'w')
+hE = open('{}.txt'.format(args.samp), 'r')
+hE_seq = open('{}_seq.fa'.format(args.samp),'w')
 
 hE_table = []
 database = {}

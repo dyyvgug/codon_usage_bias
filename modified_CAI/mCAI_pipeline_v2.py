@@ -13,7 +13,6 @@ from scipy import stats
 
 parser = argparse.ArgumentParser(description='mCAI pipeline v2.The weight from ribosome genes.The annotation file is formatted GTF.', prog='mCAI_ribo_gtf', usage='%(prog)s [options]')
 parser.add_argument('--spe', nargs='?', type=str, help='species name')
-parser.add_argument('--spA', nargs='?', type=str, help='species name abbreviation')
 parser.add_argument('--ann', nargs='*', type=str, default='ref.gtf', help='input gtf format file')
 parser.add_argument('--inp', nargs='*', type=str, default='CDS_DNA.fa',
                     help='expected FASTA file of calculations RSCU and weight')
@@ -22,7 +21,7 @@ args = parser.parse_args()
 ### Find the ribosome gene in the annotation file and its corresponding geneID.
 ###   At the same time,extract their DNA sequence.
 
-os.chdir('/media/hp/disk1/DYY/reference/annotation/{}/'.format(args.spe))
+
 gtf_path = '/media/hp/disk1/DYY/reference/annotation/{}/'.format(args.spe)
 id_file = open('ribo_geneID.txt', 'w')
 

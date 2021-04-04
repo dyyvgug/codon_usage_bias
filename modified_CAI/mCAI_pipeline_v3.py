@@ -1,22 +1,14 @@
 #!/usr/bin/python
 # coding:utf-8
 # =========================================================================================================
-# Yingying Dong.2019-11-11. mCAI pipeline v3. The weight from genes that product ribosomal protein.The genes
+# Yingying Dong.2020-8-24. mCAI pipeline v3. The weight from genes that product ribosomal protein.The genes
 #   ID from formatted GFF3 annotation file that already have CDS header.
 # =========================================================================================================
 import os
-import sys
-import argparse
 import rpy2.robjects as robjects
 from scipy import stats
 
-parser = argparse.ArgumentParser(description='mCAI pipeline v3.The annotation file is formatted GFF3.', prog='mCAI_ribo_gff', usage='%(prog)s [options]')
-parser.add_argument('--spe', nargs='?', type=str, help='species name')
-parser.add_argument('--spA', nargs='?', type=str, help='species name abbreviation')
-parser.add_argument('--ann', nargs='*', type=str, default='ref.gff', help='input gff3 format file')
-parser.add_argument('--inp', nargs='*', type=str, default='CDS_DNA.fa',
-                    help='expected FASTA file of calculations RSCU and weight')
-args = parser.parse_args()
+
 
 ### Get ribosomal gene ID from the gff3 annotation file.At the same time,extract their DNA sequence.
 

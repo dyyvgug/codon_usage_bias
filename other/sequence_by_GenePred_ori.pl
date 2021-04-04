@@ -1,4 +1,4 @@
-#ÔºÅusr/bin/perl -w
+#£°usr/bin/perl -w
 use List::Compare;
 use strict;
 #use Bio::Util::codonUsage qw(translate);
@@ -257,4 +257,3 @@ sub translate {                                                 # In the transla
 	print "warning, $cod is not a codon\n";
 	return "X";}
               }
-

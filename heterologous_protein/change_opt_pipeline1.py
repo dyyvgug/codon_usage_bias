@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(description='Change DNA sequence to improve exp
                                  usage='%(prog)s [options]')
 parser.add_argument('--spe', nargs='?', type=str, help='species name')
 parser.add_argument('--spA', nargs='?', type=str, help='species name abbreviation')
-parser.add_argument('--inDNA', nargs='*', type=str, default=0,
+parser.add_argument('--inDNA', nargs='?', type=str, default=0,
                     help='FASTA file for DNA sequences of genes that wish to increase expression')
 parser.add_argument('--inPro', nargs='*', type=str, default=0,
                     help='FASTA file for protein sequences of genes that wish to increase expression')

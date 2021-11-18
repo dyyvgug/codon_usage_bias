@@ -1,0 +1,40 @@
+Series GSE154165 		Query DataSets for GSE154165
+Status 	Public on Jan 01, 2021
+Title 	tRNA-seq and YAMAT-seq profiling the expressions of tRNA-derived fragments and tRNAs in plants
+Organisms 	Arabidopsis thaliana; Glycine max; Hordeum vulgare; Setaria italica; Sorghum bicolor; Triticum aestivum; Zea mays
+Experiment type 	Non-coding RNA profiling by high throughput sequencing
+Summary 	Here, we apply tRNA-seq and YAMAT-seq to profile the expressions of tRFs and tRNAs in plants. We provide a high-quality expression atlas of tRFs and tRNAs in Arabidopsis and rice, and uncover complex tRF population and the dynamic expressions of tRNA genes in plants.
+  	
+Overall design 	We constructed tRNA-seq and YAMAT-seq libraries from various plants. The tRNA-seq and YAMAT-seq methods were described previously (Cozen et al. 2015 Nat Methods; Zheng et al. 2015 Nat Methods; Shigematsu et al. Nucleic Acids Res.).
+  	
+Contributor(s) 	Ma X, Luan W
+Citation(s) 	
+
+    Ma X, Liu C, Kong X, Liu J et al. Extensive profiling of the expressions of tRNAs and tRNA-derived fragments (tRFs) reveals the complexities of tRNA and tRF populations in plants. Sci China Life Sci 2021 Apr;64(4):495-511. PMID: 33569675
+
+Submission date 	Jul 10, 2020
+Last update date 	Apr 03, 2021
+Contact name 	Xuan Ma
+E-mail(s) 	skyxma@tjnu.edu.cn
+Organization name 	Tianjin Normal University
+Department 	College of Life Sciences
+Street address 	Binshui West Road
+City 	Tianjin
+ZIP/Postal code 	300387
+Country 	China
+  	
+Platforms (7)
+More... More...
+	
+GPL21785 	Illumina HiSeq 4000 (Arabidopsis thaliana)
+GPL21998 	Illumina HiSeq 4000 (Glycine max)
+GPL23509 	Illumina HiSeq 4000 (Triticum aestivum)
+Samples (13)
+More... More...
+	
+GSM4665283 	tRNAseq, A.thaliana seedling leaf
+GSM4665284 	tRNAseq, A.thaliana seedling root
+GSM4665285 	tRNAseq, G.max seedling
+Relations
+BioProject 	PRJNA645307
+SRA 	SRP271230

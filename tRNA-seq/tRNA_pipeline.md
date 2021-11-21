@@ -3,7 +3,7 @@ step 1. download SRA files.
 step 2. quality control. 
 
 step 3. remove adaptor.
-Tested by me, the automatic tool'trim_galore' can't find the correct adaptor, we need find adpator by eyes. I used the tool FASTAX to remove adaptor. 
+Tested by me, the automatic tool 'trim_galore' can't find the correct adaptor, we need find adpator by eyes. I used the tool FASTAX to remove adaptor. 
 
 step 4. use bowtie2 to map.
   Firstly, create a index. For instance,

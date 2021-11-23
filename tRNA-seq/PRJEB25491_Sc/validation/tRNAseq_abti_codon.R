@@ -20,39 +20,45 @@ b2 = b1 %>% group_by(codon) %>% summarise(Frq = sum(Freq))
 b2$Codon = as.character(reverseComplement( DNAStringSet(b2$codon) ))
 names(b2) = c("anticodon","anti_fre","codon")
 
-rscu = read.table("ribo_codon_fre_RSCU.txt",header = T, stringsAsFactors = F)
+rscu_array<-c("Cytosolic RP","Mitochondria RP","HTT")
+for (i in rscu_array) {
+  
+  rscu = read.table(paste0(i,"_codon_fre_RSCU.txt"),header = T, stringsAsFactors = F)
+  bed_rscu = merge(b2,rscu,by = "codon", all = T)
+  bed_rscu = bed_rscu[-grep("NNN", bed_rscu$anticodon),]
+  bed_rscu = bed_rscu[-grep("STOP",bed_rscu$AA),]
+  bed_rscu = bed_rscu[-grep("M",bed_rscu$AA),]
+  bed_rscu = bed_rscu[-grep("W",bed_rscu$AA),]
+  
+  #bed_rscu[is.na(bed_rscu)] = 0
+  bed_rscu = bed_rscu[complete.cases(bed_rscu),]
+  bed_rscu$anticodon2 = as.character(reverseComplement( DNAStringSet(bed_rscu$codon) ))
+  #write.csv(bed_rscu,"tRNAseq_anti_ref_codon_full.csv",quote = F,row.names = F)
+  
+  # cytosolic ribosomal protein genes
+  anti_rscu_p = cor.test(log2(bed_rscu$anti_fre+1),bed_rscu$hits)
+  anti_rscu_p
+  
+  p1 <- ggplot(bed_rscu,aes(x = log2(bed_rscu$anti_fre),y = bed_rscu$hits))+
+    geom_point(shape = 16,size = 2.5,color = "red")+
+    labs(title = paste0(spA," cor_anticodon_codon    ","r=",round(anti_rscu_p$estimate,5),"  p=",round(anti_rscu_p$p.value,5)))+
+    scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
+                  labels = trans_format("log10", math_format(10^.x))) +
+    annotation_logticks(sides="bl")+
+    stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "black",size = 0.75)+
+    theme_bw()+
+    xlab("Log2 (anticodon counts)")+
+    ylab(paste0(i," codon counts"))+
+    theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(),
+          axis.title.x = element_text(size=16), axis.title.y = element_text(size=16),
+          axis.text = element_text(size=14))
+  p1
+  ggsave(paste0(i,"_anticodon_cor.pdf"),width = 20, height = 18, units = "cm")
+  write.csv(bed_rscu,paste0(i,"_anti_ref_codon.csv"),quote = F,row.names = F)
+}
 
-bed_rscu = merge(b2,rscu,by = "codon", all = T)
-bed_rscu = bed_rscu[-grep("NNN", bed_rscu$anticodon),]
-bed_rscu = bed_rscu[-grep("STOP",bed_rscu$AA),]
-bed_rscu = bed_rscu[-grep("M",bed_rscu$AA),]
-bed_rscu = bed_rscu[-grep("W",bed_rscu$AA),]
 
-#bed_rscu[is.na(bed_rscu)] = 0
-bed_rscu = bed_rscu[complete.cases(bed_rscu),]
-bed_rscu$anticodon2 = as.character(reverseComplement( DNAStringSet(bed_rscu$codon) ))
-write.csv(bed_rscu,"tRNAseq_anti_ref_codon_full.csv",quote = F,row.names = F)
-
-anti_rscu_p = cor.test(log2(bed_rscu$anti_fre+1),bed_rscu$hits)
-anti_rscu_p
-
-p1 <- ggplot(bed_rscu,aes(x = log2(bed_rscu$anti_fre),y = bed_rscu$hits))+
-  geom_point(shape = 16,size = 2.5,color = "red")+
-  labs(title = paste0(spA," cor_anticodon_codon    ","r=",round(anti_rscu_p$estimate,5),"  p=",round(anti_rscu_p$p.value,5)))+
-  scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
-                labels = trans_format("log10", math_format(10^.x))) +
-  annotation_logticks(sides="bl")+
-  stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "black",size = 0.75)+
-  theme_bw()+
-  xlab("Log2 (anticodon counts)")+
-  ylab("Cytosolic RP codon counts")+
-  theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(),
-        axis.title.x =element_text(size=16), axis.title.y=element_text(size=16),
-        axis.text = element_text(size=14))
-p1
-ggsave("Sc_RP_anticodon_forPPT.pdf",width = 20, height = 18, units = "cm")
-write.csv(bed_rscu,"tRNAseq_RP_anti_ref_codon.csv",quote = F,row.names = F)
-
+# whole genome genes
 whole = read.table("codon_frequency.txt")
 names(whole) = c("codon","aa","whole_fre")
 bed_whole = merge(b2,whole,by = "codon")
@@ -69,14 +75,15 @@ p2 <- ggplot(bed_whole,aes(x = log2(bed_whole$anti_fre),y = bed_whole$whole_fre)
   annotation_logticks(sides="bl")+
   stat_smooth(method="lm", se=FALSE,linetype="dashed", color = "black",size = 0.75)+
   theme_bw()+
-  xlab("Log2 (anticodon countS)")+
-  ylab("Whole genome codon countS")+
+  xlab("Log2 (anticodon counts)")+
+  ylab("Whole genome codon counts")+
   theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(),
         axis.title.x =element_text(size=16), axis.title.y=element_text(size=16),
         axis.text = element_text(size = 14))
 p2
-ggsave("Sc_genome_codon_forPPT.pdf")
+ggsave("Sc_genome_codon_forPPT.pdf",width = 20,height = 18,units = "cm")
 write.csv(bed_rscu,"tRNAseq_anti_genome_codon.txt",quote = F,row.names = F)
+
 #==================================================================================================
 # Eight major degenerate codon pairs
 #==================================================================================================

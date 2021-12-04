@@ -7,11 +7,11 @@ if (!require("Biostrings"))
 require(Biostrings)
 library(ggplot2)
 library(scales)
-spA = "Mm"
+spA = "Hs"
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 #setwd(paste0("G:\\Ñ§Ï°×¨ÓÃ\\tRNA\\Sc\\seqbackup\\aligned_tRNA_one"))
 list.files(getwd())
-bed = read.table("SRR4279894.bed", sep = "\t")
+bed = read.table("SRR10162600.bed", sep = "\t")
 b1 = as.data.frame(table(bed$V1))
 b1$id = gsub(".+tRNA-", "", b1$Var1)
 b1$id = gsub('-[0-9].+', "", b1$id)
@@ -23,10 +23,12 @@ names(b2) = c("anticodon","anti_fre","codon")
 
 rscu_array<-c("Cytosolic RP","Mitochondria RP","HTT")
 for (i in rscu_array) {
-  
+  if(FALSE){
+    i = "Cytosolic RP"
+  }
   rscu = read.table(paste0(i,"_codon_fre_RSCU.txt"),header = T, stringsAsFactors = F)
   bed_rscu = merge(b2,rscu,by = "codon", all = T)
-  bed_rscu = bed_rscu[-grep("NNN", bed_rscu$anticodon),]
+  #bed_rscu = bed_rscu[-grep("NNN", bed_rscu$anticodon),]
   bed_rscu = bed_rscu[-grep("STOP",bed_rscu$AA),]
   bed_rscu = bed_rscu[-grep("M",bed_rscu$AA),]
   bed_rscu = bed_rscu[-grep("W",bed_rscu$AA),]
@@ -54,7 +56,7 @@ for (i in rscu_array) {
           axis.title.x = element_text(size=16), axis.title.y = element_text(size=16),
           axis.text = element_text(size=14))
   p1
-  ggsave(paste0(i,"_anticodon_cor.pdf"),width = 20, height = 18, units = "cm")
+  ggsave(paste0(i,"_anticodon_cor.pdf"),width = 15, height = 10, units = "cm")
   write.csv(bed_rscu,paste0(i,"_anti_ref_codon.csv"),quote = F,row.names = F)
 }
 
@@ -65,6 +67,7 @@ names(whole) = c("codon","aa","whole_fre")
 bed_whole = merge(b2,whole,by = "codon")
 bed_whole = bed_whole[-grep("M",bed_whole$aa),]
 bed_whole = bed_whole[-grep("W",bed_whole$aa),]
+bed_whole = bed_whole[-grep("\\*",bed_whole$aa),]
 
 anti_whole_p = cor.test(log2(bed_whole$anti_fre),bed_whole$whole_fre)
 anti_whole_p

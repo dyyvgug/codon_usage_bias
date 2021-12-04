@@ -7,14 +7,13 @@ if (!require("Biostrings"))
 require(Biostrings)
 library(ggplot2)
 library(scales)
-spA = "Mm"
+spA = "Sc"
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 #setwd(paste0("G:\\Ñ§Ï°×¨ÓÃ\\tRNA\\Sc\\seqbackup\\aligned_tRNA_one"))
-list.files(getwd())
-bed = read.table("SRR4279894.bed", sep = "\t")
+bed = read.table("ERR2382482.bed", sep = "\t")
 b1 = as.data.frame(table(bed$V1))
 b1$id = gsub(".+tRNA-", "", b1$Var1)
-b1$id = gsub('-[0-9].+', "", b1$id)
+b1$id = gsub("-\\d-\\d+$", "", b1$id)
 b1$codon = sub(".+-", "", b1$id)
 
 b2 = b1 %>% group_by(codon) %>% summarise(Frq = sum(Freq))
@@ -23,7 +22,12 @@ names(b2) = c("anticodon","anti_fre","codon")
 
 rscu_array<-c("Cytosolic RP","Mitochondria RP","HTT")
 for (i in rscu_array) {
-  
+  if(F){
+    i = "Mitochondria RP"
+    # color = rgb(200,175,212,maxColorValue = 255)
+    i = "HTT"
+    # rgb(252,215,24)
+  }
   rscu = read.table(paste0(i,"_codon_fre_RSCU.txt"),header = T, stringsAsFactors = F)
   bed_rscu = merge(b2,rscu,by = "codon", all = T)
   bed_rscu = bed_rscu[-grep("NNN", bed_rscu$anticodon),]
@@ -41,7 +45,7 @@ for (i in rscu_array) {
   anti_rscu_p
   
   p1 <- ggplot(bed_rscu,aes(x = log2(bed_rscu$anti_fre),y = bed_rscu$hits))+
-    geom_point(shape = 16,size = 2.5,color = "red")+
+    geom_point(shape = 16,size = 2.5,color = rgb(252,215,24,maxColorValue = 255))+
     labs(title = paste0(spA," cor_anticodon_codon    ","r=",round(anti_rscu_p$estimate,5),"  p=",round(anti_rscu_p$p.value,5)))+
     scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
                   labels = trans_format("log10", math_format(10^.x))) +
@@ -54,7 +58,7 @@ for (i in rscu_array) {
           axis.title.x = element_text(size=16), axis.title.y = element_text(size=16),
           axis.text = element_text(size=14))
   p1
-  ggsave(paste0(i,"_anticodon_cor.pdf"),width = 20, height = 18, units = "cm")
+  ggsave(paste0(i,"_anticodon_cor.pdf"),width = 15, height = 10, units = "cm")
   write.csv(bed_rscu,paste0(i,"_anti_ref_codon.csv"),quote = F,row.names = F)
 }
 
@@ -82,7 +86,7 @@ p2 <- ggplot(bed_whole,aes(x = log2(bed_whole$anti_fre),y = bed_whole$whole_fre)
         axis.title.x =element_text(size=16), axis.title.y=element_text(size=16),
         axis.text = element_text(size = 14))
 p2
-ggsave(paste0(spA,"_genome_codon_forPPT.pdf"),width = 20,height = 18,units = "cm")
+ggsave("Sc_genome_codon_forPPT.pdf",width = 15,height = 10,units = "cm")
 write.csv(bed_rscu,"tRNAseq_anti_genome_codon.txt",quote = F,row.names = F)
 
 #==================================================================================================

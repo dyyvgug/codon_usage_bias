@@ -7,11 +7,9 @@
 # ====================================================================================================
 import os, sys
 import argparse
-import re
 
 parser = argparse.ArgumentParser(description='calculates codon frequency,RSCU value,weight', prog='RSCU_weight',
                                  usage='%(prog)s [options]')
-parser.add_argument('--out', nargs='?', type=str, help='output file name')
 parser.add_argument('--inp', nargs='?', type=str, help='expected FASTA file of calculations RSCU and weight')
 args = parser.parse_args()
 
@@ -78,10 +76,11 @@ def spl_codon(input):
 
 if __name__ == '__main__':
     in_file = open(args.inp, 'r')
-    '''in_file = open('geneB.fa', 'r')
-    isexists = os.path.exists('./geneB_rscu')
+    #in_file = open('geneB.fa', 'r')
+    name = args.inp.replace(".fa", "")
+    isexists = os.path.exists('./{}_rscu'.format(name))
     if not isexists:
-        os.mkdir('geneB_rscu')'''
+        os.mkdir('./{}_rscu'.format(name))
     dna = ''
     header = ''
     for line in in_file:
@@ -91,11 +90,10 @@ if __name__ == '__main__':
             dna = str.upper(dna) + line.strip()
         elif line.startswith('>') and dna != '':
             count = spl_codon(dna)
-            f = open('{}_rscu.txt'.format(header), "a")
+            f = open('./{}_rscu/{}_rscu.txt'.format(name, header), "a")
             f.write(' AA\tcodon\thits\tfrequency\tRSCU\n')
             calc_freq(count, f)
             header = line.strip().replace('>', '')
-            dna = ''
             codon_count = {
                 'GCT': 0, 'GCC': 0, 'GCA': 0, 'GCG': 0, 'CGT': 0, 'CGC': 0, 'CGA': 0, 'CGG': 0,
                 'ACT': 0, 'ACC': 0, 'ACA': 0, 'ACG': 0, 'GTT': 0, 'GTC': 0, 'GTA': 0, 'GTG': 0,
@@ -106,6 +104,7 @@ if __name__ == '__main__':
                 'AGT': 0, 'AGC': 0, 'AGA': 0, 'AGG': 0, 'TTT': 0, 'TTC': 0, 'TTA': 0, 'TTG': 0,
                 'TGT': 0, 'TGC': 0, 'TGG': 0, 'TAT': 0, 'TAC': 0, 'TAA': 0, 'TAG': 0, 'TGA': 0
             }
+            dna = ''
             f.close()
     in_file.close()
 

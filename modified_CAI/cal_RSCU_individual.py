@@ -5,7 +5,7 @@
 # This program calculates codon frequency,RSCU value,weight in the gene FASTA sequence file.
 #  Each gene has individual statistical file.
 # ====================================================================================================
-import os, sys
+import os
 import argparse
 
 parser = argparse.ArgumentParser(description='calculates codon frequency,RSCU value,weight', prog='RSCU_weight',
@@ -83,7 +83,11 @@ if __name__ == '__main__':
         os.mkdir('./{}_rscu'.format(name))
     dna = ''
     header = ''
-    for line in in_file:
+    file = in_file.read()
+    file += '\n>'
+    file = file.split('\n')
+
+    for line in file:
         if line.startswith('>') and dna == '':
             header = line.strip().replace('>', '')
         elif not line.startswith('>'):

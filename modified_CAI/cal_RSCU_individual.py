@@ -94,7 +94,7 @@ if __name__ == '__main__':
             dna = str.upper(dna) + line.strip()
         elif line.startswith('>') and dna != '':
             count = spl_codon(dna)
-            f = open('./{}_rscu/{}_rscu.txt'.format(name, header), "a")
+            f = open('./{}_rscu/{}_rscu.txt'.format(name, header), "w")
             f.write(' AA\tcodon\thits\tfrequency\tRSCU\n')
             calc_freq(count, f)
             header = line.strip().replace('>', '')

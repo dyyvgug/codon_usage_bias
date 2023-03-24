@@ -10,7 +10,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='calculates codon frequency,RSCU value,weight', prog='RSCU_weight',
                                  usage='%(prog)s [options]')
-parser.add_argument('--out', nargs='?', type=str, help='output file name')
+parser.add_argument('--out', nargs='?', type=str, default='',help='output file name')
 parser.add_argument('--inp', nargs='?', type=str, help='expected FASTA file of calculations RSCU and weight')
 args = parser.parse_args()
 
@@ -66,7 +66,8 @@ def calc_freq(codon_count, out_file):
 
 
 in_file = open(args.inp, 'r')
-out_file = open('{}_codon_fre_RSCU.txt'.format(args.out), 'w')
+name = args.inp.replace(".fa", "")
+out_file = open('{}{}_codon_fre_RSCU.txt'.format(args.out,name), 'w')
 
 # Reads the DNA sequence into a single string.
 dna = ''

@@ -1,6 +1,7 @@
-#£¡usr/bin/perl -w
+#Â£Â¡usr/bin/perl -w
 use List::Compare;
 use strict;
+# This script came from Prof.Yunkun Dang.
 #use Bio::Util::codonUsage qw(translate);
 
 =head1 the purpose

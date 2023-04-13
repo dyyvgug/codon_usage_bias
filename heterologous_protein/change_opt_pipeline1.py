@@ -1,9 +1,11 @@
 #!/usr/bin/python
 # coding:utf-8
+
 # ===========================================================================================================
-# Yingying Dong.2019-12-10.Modified date: 2019-1-9.Change DNA sequence to improve expression pipeline v1.0.
+# Yingying Dong. Creation time: 2019-12-10.Change DNA sequence to improve expression pipeline v1.0.
 #  Change the sequence codons to optimal,and avoid polyN and restriction sites.
 # ===========================================================================================================
+
 import os
 import re
 import sys

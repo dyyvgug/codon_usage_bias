@@ -1,3 +1,4 @@
+# draw NC-plot.
 library('ggplot2')
 library('reshape2')
 library('corrplot')

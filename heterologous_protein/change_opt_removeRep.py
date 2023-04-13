@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # coding:utf-8
 # =========================================================================================================
-# Yingying Dong.2019-12-10.Modified date: 2019-12-12. Change the sequence codons to optimal.
+# Yingying Dong.Creation time: 2019-12-12. Change the sequence codons to optimal.
 # =========================================================================================================
 import os
 import sys

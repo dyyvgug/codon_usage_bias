@@ -6,8 +6,8 @@ require(Biostrings)
 library(ggplot2)
 spA = "Hs"
 spe = "hg38"
-setwd("G:\\学习专用\\tRNA\\Hs\\seq(HEK293)\\ribo")
-pathw = paste0("G:\\学习专用\\tRNA\\Hs\\seq(HEK293)\\ribo")
+setwd("G:\\tRNA\\Hs\\seq(HEK293)\\ribo")
+pathw = paste0("G:\\tRNA\\Hs\\seq(HEK293)\\ribo")
 tRNA_array = list.files(getwd(),pattern = "txt$") 
 tRNA_array
 for(i in tRNA_array){
@@ -84,7 +84,7 @@ for(i in tRNA_array){
   write.table(tRNA_rscu,paste0(pathw,"ribo_codon_re_dis_anticodon.txt"),sep = '\t',quote = F,row.names = F)
   
   
-  whole = read.table("G:\\学习专用\\annotation\\hg19\\ref\\codon_frequency.txt")
+  whole = read.table("G:\\瀛︿範涓撶敤\\annotation\\hg19\\ref\\codon_frequency.txt")
   names(whole) = c("codon","aa","whole_fre")
   
   tRNA_whole = merge(t,whole,by = "codon")

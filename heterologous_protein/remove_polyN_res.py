@@ -1,5 +1,5 @@
 # ==============================================================================================================
-# Yingying Dong.2019-12-30. Remove sequence fragments with many repeated bases and restriction site ,
+# Yingying Dong.Creation time: 2019-12-30. Remove sequence fragments with many repeated bases and restriction site,
 #  then replaced with to rare codons.
 # ==============================================================================================================
 full_opt = open('bac_Kp_opt.fa', 'r')

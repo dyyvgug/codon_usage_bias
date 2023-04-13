@@ -10,7 +10,6 @@ library(ggplot2)
 library(scales)
 spA = "Hs"
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-#setwd(paste0("G:\\Ñ§Ï°×¨ÓÃ\\tRNA\\Sc\\seqbackup\\aligned_tRNA_one"))
 list.files(getwd())
 # SRR10162595 skin
 # SRR10162592 colon

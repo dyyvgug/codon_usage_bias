@@ -34,7 +34,6 @@ def findopt(aa):
     opt_dic[aa] = list(aa_codon_fre.keys())[list(aa_codon_fre.values()).index({aa: str(optimal)})]
     return opt_dic
 
-
 list_aa = ['C', 'D', 'E', 'F', 'G', 'H', 'K', 'I', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'Y', 'T', 'V', 'W']
 for a in list_aa:
     findopt(a)

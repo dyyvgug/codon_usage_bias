@@ -2,7 +2,8 @@
 use List::Compare;
 use strict;
 # This script was written by Prof.Yunkun Dang, annatation was written by Yingying Dong.
-#use Bio::Util::codonUsage qw(translate);
+# use Bio::Util::codonUsage qw(translate);
+# for installing List::Compare module, using cpan, $ perl -MCPAN -e shell, enter the shell, then > install List::Compare.
 
 =head1 the purpose
 This script is to extract the sequence from GenePred file, which can be created with gtf or gff3 with UCSC tools gtfToGenePred or gff3ToGenePred.

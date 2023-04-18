@@ -1,7 +1,7 @@
 #£¡usr/bin/perl -w
 use List::Compare;
 use strict;
-# This script came from Prof.Yunkun Dang.
+# This script was written by Prof.Yunkun Dang, annatation was written by Yingying Dong.
 #use Bio::Util::codonUsage qw(translate);
 
 =head1 the purpose

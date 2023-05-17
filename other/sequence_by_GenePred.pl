@@ -3,7 +3,7 @@ use List::Compare;
 use strict;
 # ===========================================================================================================================================
 # This original script came from Yunkun Dang, it's aimed at get the CDS from genome FASTA file and annotation gtf file. Since the gtf file is 
-# out of fashion, so me Yingying Dong modified this script, we can get the CDS from GFF3 files.
+# out of fashion, so Yingying Dong modified this script, we can get the CDS from GFF3 files.
 # ===========================================================================================================================================
 
 my $ge ; my %genome; my $species = "Apis_mellifera" ;  
